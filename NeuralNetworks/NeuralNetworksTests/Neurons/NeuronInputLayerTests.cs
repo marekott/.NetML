@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using NeuralNetworks.Neurons;
 using Xunit;
 

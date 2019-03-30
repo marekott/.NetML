@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace NeuralNetworks.Neurons
 {
@@ -15,28 +16,44 @@ namespace NeuralNetworks.Neurons
 		{
 			if (biases != null)
 			{
-				inputs = AddBiases(inputs, biases);
+				inputs.Add(biases);
 			}
 
-			double sum = 0.0;
-			foreach (var input in inputs)
-			{
-				sum += Math.Exp(input);
-			}
-
-			var result = Math.Exp(inputs[NeuronPositionFromTop]) / sum;
+			var result = Softmax(inputs);
 
 			return result;
 		}
 
-		private double[] AddBiases(double[] inputs, double[] biases)
+		private double Softmax(double[] inputs)
 		{
-			for (int i = 0; i < inputs.Length; i++)
+			var counter = inputs.Select(Math.Exp).Sum();
+			var result = Math.Exp(inputs[NeuronPositionFromTop]) / counter;
+
+			return result;
+		}
+	}
+
+	public static class ArrayExtensions
+	{
+		public static void Add(this double[] array, double[] arrayToAdd)
+		{
+			if (array.IsArrayEqual(arrayToAdd))
 			{
-				inputs[i] += biases[i];
+				for (int i = 0; i < array.Length; i++)
+				{
+					array[i] += arrayToAdd[i];
+				}
 			}
 
-			return inputs;
+			else
+			{
+				throw new IndexOutOfRangeException("Arrays haven't the same size.");
+			}
+		}
+
+		private static bool IsArrayEqual(this double[] array, double[] arrayToCompare)
+		{
+			return array.GetLength(0) == arrayToCompare.GetLength(0);
 		}
 	}
 }
