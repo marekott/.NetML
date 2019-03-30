@@ -41,12 +41,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Network\NeuralNetwork.cs" />
     <Compile Include="Neurons\Neuron.cs" />
     <Compile Include="Neurons\NeuronHiddenLayer.cs" />
     <Compile Include="Neurons\NeuronInputLayer.cs" />
     <Compile Include="Neurons\NeuronOutputLayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\FileDeserializer\FileDeserializer\FileDeserializer\FileDeserializer.csproj">
+      <Project>{d95d41d5-9e69-494d-8bf9-993945dfc314}</Project>
+      <Name>FileDeserializer</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

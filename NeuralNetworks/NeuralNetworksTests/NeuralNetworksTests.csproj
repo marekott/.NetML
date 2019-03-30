@@ -63,18 +63,25 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
+    <Compile Include="Mock\MockFileLocator.cs" />
+    <Compile Include="Network\NeuralNetworkTests.cs" />
     <Compile Include="Neurons\NeuronHiddenLayerTests.cs" />
     <Compile Include="Neurons\NeuronInputLayerTests.cs" />
     <Compile Include="Neurons\NeuronOutputLayerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Mock\2_2_2_Weights.csv" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\xunit.analyzers.0.10.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\FileDeserializer\FileDeserializer\FileDeserializer\FileDeserializer.csproj">
+      <Project>{d95d41d5-9e69-494d-8bf9-993945dfc314}</Project>
+      <Name>FileDeserializer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NeuralNetworks\NeuralNetworks.csproj">
       <Project>{7ECA02E8-E849-4C7D-A23C-2159853102EB}</Project>
       <Name>NeuralNetworks</Name>
