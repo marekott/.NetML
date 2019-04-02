@@ -8,7 +8,7 @@
 		{
 			NeuronPositionFromTop = neuronPositionFromTop;
 		}
-		//TODO Prawdopodobnie bias do wywalenia, bo będzie obliczany w klasie sieci, zweryfikuj
-		public abstract double ComputeOutput(double[] inputs, double[] biases = null);
+		
+		public abstract double ComputeOutput(double[] inputs);
 	}
 }

@@ -12,13 +12,8 @@ namespace NeuralNetworks.Neurons
 		{
 		}
 
-		public override double ComputeOutput(double[] inputs, double[] biases = null)
+		public override double ComputeOutput(double[] inputs)
 		{
-			if (biases != null)
-			{
-				inputs.Add(biases);
-			}
-
 			var result = Softmax(inputs);
 
 			return result;
@@ -30,30 +25,6 @@ namespace NeuralNetworks.Neurons
 			var result = Math.Exp(inputs[NeuronPositionFromTop]) / counter;
 
 			return result;
-		}
-	}
-
-	public static class ArrayExtensions
-	{
-		public static void Add(this double[] array, double[] arrayToAdd)
-		{
-			if (array.IsArrayEqual(arrayToAdd))
-			{
-				for (int i = 0; i < array.Length; i++)
-				{
-					array[i] += arrayToAdd[i];
-				}
-			}
-
-			else
-			{
-				throw new IndexOutOfRangeException("Arrays haven't the same size.");
-			}
-		}
-
-		private static bool IsArrayEqual(this double[] array, double[] arrayToCompare)
-		{
-			return array.GetLength(0) == arrayToCompare.GetLength(0);
 		}
 	}
 }

@@ -85,71 +85,6 @@ namespace NeuralNetworksTests.Neurons
 		}
 
 		[Fact]
-		public void ComputeOutputFirstNeuronInLayerOneInputAndBiasesTest()
-		{
-			var numberOfInputs = 1;
-			var neuronPositionFromTop = 0;
-
-			var neuron = new NeuronInputLayer(neuronPositionFromTop, numberOfInputs);
-
-			var neuronOutput = neuron.ComputeOutput(_inputsWith3Numbers, _inputsWith3Biases);
-
-			Assert.Equal(6.0, neuronOutput, 5);
-		}
-
-		[Fact]
-		public void ComputeOutputSecondNeuronInLayerOneInputAndBiasesTest()
-		{
-			var numberOfInputs = 1;
-			var neuronPositionFromTop = 1;
-
-			var neuron = new NeuronInputLayer(neuronPositionFromTop, numberOfInputs);
-
-			var neuronOutput = neuron.ComputeOutput(_inputsWith3Numbers, _inputsWith3Biases);
-
-			Assert.Equal(12.0, neuronOutput, 5);
-		}
-
-		[Fact]
-		public void ComputeOutputThirdNeuronInLayerOneInputAndBiasesTest()
-		{
-			var numberOfInputs = 1;
-			var neuronPositionFromTop = 2;
-
-			var neuron = new NeuronInputLayer(neuronPositionFromTop, numberOfInputs);
-
-			var neuronOutput = neuron.ComputeOutput(_inputsWith3Numbers, _inputsWith3Biases);
-
-			Assert.Equal(23.0, neuronOutput, 5);
-		}
-
-		[Fact]
-		public void ComputeOutputFirstNeuronInLayerFiveInputsAndBiasesTest()
-		{
-			var numberOfInputs = 5;
-			var neuronPositionFromTop = 0;
-
-			var neuron = new NeuronInputLayer(neuronPositionFromTop, numberOfInputs);
-
-			var neuronOutput = neuron.ComputeOutput(_inputsWith10Numbers, _inputsWith10Biases);
-
-			Assert.Equal(25.0, neuronOutput, 5);
-		}
-
-		[Fact]
-		public void ComputeOutputSecondNeuronInLayerFiveInputsAndBiasesTest()
-		{
-			var numberOfInputs = 5;
-			var neuronPositionFromTop = 1;
-
-			var neuron = new NeuronInputLayer(neuronPositionFromTop, numberOfInputs);
-
-			var neuronOutput = neuron.ComputeOutput(_inputsWith10Numbers, _inputsWith10Biases);
-
-			Assert.Equal(49.0, neuronOutput, 5);
-		}
-
-		[Fact]
 		public void ThrowIndexWasOutOfRangeException()
 		{
 			var numberOfInputs = 5;
@@ -157,7 +92,7 @@ namespace NeuralNetworksTests.Neurons
 
 			var neuron = new NeuronInputLayer(neuronPositionFromTop, numberOfInputs);
 
-			Assert.Throws<IndexOutOfRangeException>(() => neuron.ComputeOutput(_inputsWith3Numbers, _inputsWith3Biases));
+			Assert.Throws<IndexOutOfRangeException>(() => neuron.ComputeOutput(_inputsWith3Numbers));
 		}
 	}
 }

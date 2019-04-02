@@ -13,18 +13,13 @@
 			_numberOfInputs = numberOfInputs;
 		}
 
-		public override double ComputeOutput(double[] inputs, double[] biases = null)
+		public override double ComputeOutput(double[] inputs)
 		{
 			double inputSum = 0;
 
 			for (int i = _numberOfInputs * NeuronPositionFromTop; i <= _numberOfInputs * (NeuronPositionFromTop + 1) - 1; i++) //for numberOfInputs=5 and neuronPositionFromTop=2 takes arguments from inputs(with Length=10) with indexes from <5:9>)
 			{
 				inputSum += inputs[i];
-			}
-
-			if (biases != null)
-			{
-				inputSum += biases[NeuronPositionFromTop];
 			}
 
 			return inputSum;

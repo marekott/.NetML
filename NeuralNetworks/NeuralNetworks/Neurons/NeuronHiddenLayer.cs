@@ -11,13 +11,8 @@ namespace NeuralNetworks.Neurons
 		{
 		}
 
-		public override double ComputeOutput(double[] inputs, double[] biases = null)
+		public override double ComputeOutput(double[] inputs)
 		{
-			if (biases != null)
-			{
-				inputs[NeuronPositionFromTop] += biases[NeuronPositionFromTop];
-			}
-
 			return Tanh(inputs[NeuronPositionFromTop]);
 		}
 	}
