@@ -122,7 +122,7 @@ namespace NeuralNetworksTests.Network
 		}
 
 		[Fact]
-		public void NeuralNetworkProperWeightsSetTestWithSchema2_2_refactor()
+		public void NeuralNetworkProperWeightsSetTestWithSchema2_2()
 		{
 			int numberOfInputs = 2;
 			int numberOfOutputs = 2;
@@ -148,7 +148,7 @@ namespace NeuralNetworksTests.Network
 		}
 
 		[Fact]
-		public void NeuralNetworkProperWeightsSetTestWithSchema2_2_2_refactor()
+		public void NeuralNetworkProperWeightsSetTestWithSchema2_2_2()
 		{
 			int numberOfInputs = 2;
 			int[] hiddenLayers = { 2 };
@@ -182,7 +182,7 @@ namespace NeuralNetworksTests.Network
 		}
 
 		[Fact]
-		public void NeuralNetworkProperWeightsSetTestWithSchema2_3_2_2_refactor()
+		public void NeuralNetworkProperWeightsSetTestWithSchema2_3_2_2()
 		{
 			int numberOfInputs = 2;
 			int[] hiddenLayers = { 3, 2 };
@@ -304,6 +304,218 @@ namespace NeuralNetworksTests.Network
 			neuralNetwork.SetWeights(fileWithWeights);
 
 			neuralNetwork.ComputeOutput(input);
+		}
+
+		[Fact]
+		public void NeuralNetworkProperWeightsSetTestWithSchema2_2WithBias()
+		{
+			int numberOfInputs = 2;
+			int numberOfOutputs = 2;
+			var fileWithWeights = new Csv(new MockFileLocator(@"Mock\2_2_Weights.csv"), ';');
+			var fileWithBiases = new Csv(new MockFileLocator(@"Mock\2_2_Biases.csv"), ';');
+
+			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs);
+			neuralNetwork.SetWeights(fileWithWeights);
+
+
+			double[][][] expectedWeights = new double[1][][];
+			expectedWeights[0] = new double[2][];
+			for (int i = 0; i < expectedWeights[0].Length; i++)
+			{
+				expectedWeights[0][i] = new double[2];
+			}
+
+			expectedWeights[0][0][0] = 0.5;
+			expectedWeights[0][0][1] = 0.2;
+			expectedWeights[0][1][0] = 0.3;
+			expectedWeights[0][1][1] = 1.4;
+
+			neuralNetwork.SetBiases(fileWithBiases);
+
+			double[][] expectedBiases = new double[1][];
+			expectedBiases[0] = new double[2];
+			expectedBiases[0][0] = 0.9;
+			expectedBiases[0][1] = 0.1;
+
+			Assert.Equal(expectedBiases, neuralNetwork.NeuronsBiases);
+			Assert.Equal(expectedWeights, neuralNetwork.ConnectionsWeights);
+		}
+
+		[Fact]
+		public void NeuralNetworkProperWeightsSetTestWithSchema2_2_2WithBias()
+		{
+			int numberOfInputs = 2;
+			int[] hiddenLayers = { 2 };
+			int numberOfOutputs = 2;
+			var fileWithWeights = new Csv(new MockFileLocator(@"Mock\2_2_2_Weights.csv"), ';');
+			var fileWithBiases = new Csv(new MockFileLocator(@"Mock\2_2_2_Biases.csv"), ';');
+
+			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
+			neuralNetwork.SetWeights(fileWithWeights);
+
+			double[][][] expectedWeights = new double[2][][];
+			expectedWeights[0] = new double[2][];
+			expectedWeights[1] = new double[2][];
+			foreach (var layer in expectedWeights)
+			{
+				for (int j = 0; j < layer.Length; j++)
+				{
+					layer[j] = new double[2];
+				}
+			}
+
+			expectedWeights[0][0][0] = 0.5;
+			expectedWeights[0][0][1] = 0.2;
+			expectedWeights[0][1][0] = 0.3;
+			expectedWeights[0][1][1] = 1.4;
+			expectedWeights[1][0][0] = 0.6;
+			expectedWeights[1][0][1] = 0.3;
+			expectedWeights[1][1][0] = 0.5;
+			expectedWeights[1][1][1] = 0.7;
+
+			neuralNetwork.SetBiases(fileWithBiases);
+
+			double[][] expectedBiases = new double[2][];
+			for (int i = 0; i < expectedBiases.Length; i++)
+			{
+				expectedBiases[i] = new double[2];
+			}
+
+			expectedBiases[0][0] = 0.9;
+			expectedBiases[0][1] = 0.1;
+			expectedBiases[1][0] = 0.8;
+			expectedBiases[1][1] = 0.2;
+
+			Assert.Equal(expectedBiases, neuralNetwork.NeuronsBiases);
+			Assert.Equal(expectedWeights, neuralNetwork.ConnectionsWeights);
+		}
+
+		[Fact]
+		public void NeuralNetworkProperWeightsSetTestWithSchema2_3_2_2WithBias()
+		{
+			int numberOfInputs = 2;
+			int[] hiddenLayers = { 3, 2 };
+			int numberOfOutputs = 2;
+			var fileWithWeights = new Csv(new MockFileLocator(@"Mock\2_3_2_2_Weights.csv"), ';');
+			var fileWithBiases = new Csv(new MockFileLocator(@"Mock\2_3_2_2_Biases.csv"), ';');
+
+			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
+			neuralNetwork.SetWeights(fileWithWeights);
+
+			double[][][] expectedWeights = new double[3][][];
+			expectedWeights[0] = new double[2][];
+			expectedWeights[1] = new double[3][];
+			expectedWeights[2] = new double[2][];
+
+			for (int i = 0; i < expectedWeights[0].Length; i++)
+			{
+				expectedWeights[0][i] = new double[3];
+				expectedWeights[2][i] = new double[2];
+			}
+
+			for (int i = 0; i < expectedWeights[1].Length; i++)
+			{
+				expectedWeights[1][i] = new double[2];
+			}
+
+			expectedWeights[0][0][0] = 0.5;
+			expectedWeights[0][0][1] = 0.2;
+			expectedWeights[0][0][2] = 0.4;
+			expectedWeights[0][1][0] = 0.3;
+			expectedWeights[0][1][1] = 1.4;
+			expectedWeights[0][1][2] = 0.53;
+
+			expectedWeights[1][0][0] = 0.6;
+			expectedWeights[1][0][1] = 0.3;
+			expectedWeights[1][1][0] = 0.5;
+			expectedWeights[1][1][1] = 0.7;
+			expectedWeights[1][2][0] = 0.6;
+			expectedWeights[1][2][1] = 0.7;
+
+			expectedWeights[2][0][0] = 0.63;
+			expectedWeights[2][0][1] = 0.34;
+			expectedWeights[2][1][0] = 0.52;
+			expectedWeights[2][1][1] = 0.71;
+
+			neuralNetwork.SetBiases(fileWithBiases);
+
+			double[][] expectedBiases = new double[3][];
+			expectedBiases[0] = new double[3];
+			expectedBiases[1] = new double[2];
+			expectedBiases[2] = new double[2];
+
+			expectedBiases[0][0] = 0.9;
+			expectedBiases[0][1] = 0.1;
+			expectedBiases[0][2] = 0.8;
+			expectedBiases[1][0] = 0.2;
+			expectedBiases[1][1] = 0.5;
+			expectedBiases[2][0] = 0.3;
+			expectedBiases[2][1] = 0.3;
+
+			Assert.Equal(expectedBiases, neuralNetwork.NeuronsBiases);
+			Assert.Equal(expectedWeights, neuralNetwork.ConnectionsWeights);
+		}
+
+		[Fact]
+		public void NetworkOutputTestWithSchema_2_2AndBiases()
+		{
+			int numberOfInputs = 2;
+			int numberOfOutputs = 2;
+			var fileWithWeights = new Csv(new MockFileLocator(@"Mock\2_2_Weights.csv"), ';');
+			var fileWithBiases = new Csv(new MockFileLocator(@"Mock\2_2_Biases.csv"), ';');
+			double[] input = { 5.0, 3.0 };
+			double[] expected = { 0.268941421369995, 0.731058578630005 };
+
+			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs);
+			neuralNetwork.SetWeights(fileWithWeights);
+			neuralNetwork.SetBiases(fileWithBiases);
+
+			var actual = neuralNetwork.ComputeOutput(input);
+
+			Assert.Equal(expected[0], actual[0], 9);
+			Assert.Equal(expected[1], actual[1], 9);
+		}
+
+		[Fact]
+		public void NetworkOutputTestWithSchema_2_2_2AndBiases()
+		{
+			int numberOfInputs = 2;
+			int[] hiddenLayers = { 2 };
+			int numberOfOutputs = 2;
+			var fileWithWeights = new Csv(new MockFileLocator(@"Mock\2_2_2_Weights.csv"), ';');
+			var fileWithBiases = new Csv(new MockFileLocator(@"Mock\2_2_2_Biases.csv"), ';');
+			double[] input = { 5.0, 3.0 };
+			double[] expected = { 0.668165494750142, 0.331834505249858 };
+
+			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
+			neuralNetwork.SetWeights(fileWithWeights);
+			neuralNetwork.SetBiases(fileWithBiases);
+
+			var actual = neuralNetwork.ComputeOutput(input);
+
+			Assert.Equal(expected[0], actual[0], 9);
+			Assert.Equal(expected[1], actual[1], 9);
+		}
+
+		[Fact]
+		public void NetworkOutputTestWithSchema_2_3_2_2AndBiases()
+		{
+			int numberOfInputs = 2;
+			int[] hiddenLayers = { 3, 2 };
+			int numberOfOutputs = 2;
+			var fileWithWeights = new Csv(new MockFileLocator(@"Mock\2_3_2_2_Weights.csv"), ';');
+			var fileWithBiases = new Csv(new MockFileLocator(@"Mock\2_3_2_2_Biases.csv"), ';');
+			double[] input = { 5.0, 3.0 };
+			double[] expected = { 0.522961404687474, 0.477038595312526 };
+
+			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
+			neuralNetwork.SetWeights(fileWithWeights);
+			neuralNetwork.SetBiases(fileWithBiases);
+
+			var actual = neuralNetwork.ComputeOutput(input);
+
+			Assert.Equal(expected[0], actual[0], 9);
+			Assert.Equal(expected[1], actual[1], 9);
 		}
 	}
 }

@@ -11,11 +11,13 @@ namespace NeuralNetworks.Network
 		private readonly NeuronOutputLayer[] _outputLayer;
 		//TODO komentarz reSharpera
 		private double[][][] _connectionsWeights;
+		private double[][] _neuronsBiases;
 
 		public int InputLayerNeuronsNumber => _inputLayer.Length;
 		public int HiddenLayersNumber => _hiddenLayer?.Length ?? 0;
 		public int OutputLayerNeuronsNumber => _outputLayer.Length;
 		public double[][][] ConnectionsWeights => _connectionsWeights;
+		public double[][] NeuronsBiases => _neuronsBiases;
 
 		public NeuralNetwork(int numberOfInputs, int numberOfOutputs, int[] hiddenLayers = null)
 		{
@@ -45,12 +47,12 @@ namespace NeuralNetworks.Network
 			}
 		}
 		
-		//TODO Refactor + metoda obliczająca potrzebną liczbę wag i porównująca z tą z pliku + bias
+		//TODO Refactor + metoda obliczająca potrzebną liczbę wag i porównująca z tą z pliku + opis metody jak w pliku powinny być ułożone wagi
 		public void SetWeights(Csv fileWithWeights)
 		{
 			int currentWeightFromFile = 0;
 			var weights = fileWithWeights.Deserialize<double>();
-			int numberOfConnectionsLayers = (2 + HiddenLayersNumber) - 1;
+			int numberOfConnectionsLayers = CountConnectionLayers();
 			int lastLayerIndex = numberOfConnectionsLayers - 1;
 			_connectionsWeights = new double[numberOfConnectionsLayers][][];
 
@@ -96,12 +98,56 @@ namespace NeuralNetworks.Network
 					for (int currentConnection = 0; currentConnection < _connectionsWeights[currentLayer][currentNeuron].Length; currentConnection++)
 					{
 						_connectionsWeights[currentLayer][currentNeuron][currentConnection] = weights[currentWeightFromFile++];
+					}					
+				}
+			}
+		}
+		//TODO Refactor + metoda obliczająca potrzebną liczbę progów i porównująca z tą z pliku (chyba że nie każdy neuron musi mieć bias) + opis metody jak w pliku powinny być ułożone biasy
+		public void SetBiases(Csv fileWithBiases)
+		{
+			int currentBiasFromFile = 0;
+			var biases = fileWithBiases.Deserialize<double>();
+			int numberOfConnectionsLayers = CountConnectionLayers();
+			int lastLayerIndex = numberOfConnectionsLayers - 1;
+			_neuronsBiases = new double[numberOfConnectionsLayers][];
+
+			for (int currentLayer = 0; currentLayer < numberOfConnectionsLayers; currentLayer++)
+			{
+				if (currentLayer == 0)
+				{
+					if (_hiddenLayer != null)
+					{
+						_neuronsBiases[currentLayer] = new double[_hiddenLayer[currentLayer].Length];
 					}
+					else
+					{
+						_neuronsBiases[currentLayer] = new double[OutputLayerNeuronsNumber];
+					}
+				}
+				else if (currentLayer == lastLayerIndex)
+				{
+					_neuronsBiases[currentLayer] = new double[OutputLayerNeuronsNumber];
+				}
+				else if(_hiddenLayer != null)
+				{
+					_neuronsBiases[currentLayer] = new double[_hiddenLayer[currentLayer].Length];
+				}
+
+				for (int currentNeuron = 0; currentNeuron < _neuronsBiases[currentLayer].Length; currentNeuron++)
+				{
+					_neuronsBiases[currentLayer][currentNeuron] = biases[currentBiasFromFile++];
 				}
 			}
 		}
 
-		//TODO bias + jakiś test czy liczba inputów równa się liczbie neuronów wejściowych
+		private int CountConnectionLayers()
+		{
+			int numberOfConnectionsLayers = (2 + HiddenLayersNumber) - 1;
+
+			return numberOfConnectionsLayers;
+		}
+
+		//TODO jakiś test czy liczba inputów równa się liczbie neuronów wejściowych
 		public double[] ComputeOutput(double[] input)
 		{
 			var signalsSums = new double[_connectionsWeights.Length][];
@@ -145,6 +191,11 @@ namespace NeuralNetworks.Network
 					signalsSums[layer][connection] += _inputLayer[neuron].ComputeOutput(input) *
 													  _connectionsWeights[layer][neuron][connection];
 				}
+
+				if (_neuronsBiases != null)
+				{
+					signalsSums[layer][connection] += _neuronsBiases[layer][connection];
+				}
 			}
 
 			return signalsSums;
@@ -161,6 +212,11 @@ namespace NeuralNetworks.Network
 				{
 					signalsSums[layer][connection] += _hiddenLayer[layer - 1][neuron].ComputeOutput(signalsSums[layer - 1]) *
 					                                  _connectionsWeights[layer][neuron][connection];
+				}
+
+				if (_neuronsBiases != null)
+				{
+					signalsSums[layer][connection] += _neuronsBiases[layer][connection];
 				}
 			}
 
