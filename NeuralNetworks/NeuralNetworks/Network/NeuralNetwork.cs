@@ -1,9 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FileDeserializer.CSV;
 using NeuralNetworks.Neurons;
 
 namespace NeuralNetworks.Network
 {
+	//TODO popatrz gdzie try catch wrzucić
 	public class NeuralNetwork
 	{
 		private readonly NeuronInputLayer[] _inputLayer;
@@ -48,6 +50,7 @@ namespace NeuralNetworks.Network
 		}
 		
 		//TODO Refactor + metoda obliczająca potrzebną liczbę wag i porównująca z tą z pliku + opis metody jak w pliku powinny być ułożone wagi
+		//TODO losowe ustawianie wag
 		public void SetWeights(Csv fileWithWeights)
 		{
 			int currentWeightFromFile = 0;
@@ -61,10 +64,6 @@ namespace NeuralNetworks.Network
 				if (currentLayer == 0)
 				{
 					_connectionsWeights[currentLayer] = new double[InputLayerNeuronsNumber][];
-				}
-				else if(currentLayer == lastLayerIndex)
-				{
-					_connectionsWeights[currentLayer] = new double[OutputLayerNeuronsNumber][];
 				}
 				else
 				{
@@ -233,5 +232,67 @@ namespace NeuralNetworks.Network
 
 			return networkResponse;
 		}
+		//TODO działa tylko dla odpowiedzi zero jedynkowych, wymyśl mechanizm który określi czy odpwoiedź jest dobra
+		public double GetAccuracy(Csv fileWithData)
+		{
+			int numCorrect = 0;
+			int numWrong = 0;
+			var data = fileWithData.DeserializeByRows<double>();
+			double[] inputs = new double[InputLayerNeuronsNumber];
+			double[] correctResults = new double[OutputLayerNeuronsNumber];
+			double[] networkResponse;
+
+			for (int i = 0; i < data.GetLength(0); i++)
+			{
+				int k = 0;
+				for (int j = 0; j < InputLayerNeuronsNumber; j++)
+				{
+					inputs[j] = data[i, j];
+				}
+
+				for (int j = InputLayerNeuronsNumber; j < data.GetLength(1); j++)
+				{
+					correctResults[k] = data[i, j];
+					k++;
+				}
+
+				networkResponse = ComputeOutput(inputs);
+				int maxIndex = MaxIndex(networkResponse);
+				int correctMaxIndex = MaxIndex(correctResults);
+
+				if (maxIndex == correctMaxIndex)
+				{
+					++numCorrect;
+				}
+				else
+				{
+					++numWrong;
+				}
+			}
+
+			return (numCorrect * 1.0) / (numCorrect + numWrong);
+		}
+
+		private static int MaxIndex(double[] vector)
+		{
+			int bigIndex = 0;
+			double biggestVal = vector[0];
+			for (int i = 0; i < vector.Length; ++i)
+			{
+				if (vector[i] > biggestVal)
+				{
+					biggestVal = vector[i];
+					bigIndex = i;
+				}
+			}
+			return bigIndex;
+		}
+
+		public void Train(Csv traningData, int maxEpochs, double learningRate, double momentum)
+		{
+			throw new System.NotImplementedException();
+		}
+
+		
 	}
 }
