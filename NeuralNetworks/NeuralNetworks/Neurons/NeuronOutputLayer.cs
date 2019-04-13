@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace NeuralNetworks.Neurons
 {
-	public class NeuronOutputLayer : Neuron
+	public class NeuronOutputLayer : Neuron //TODO potrzeba innej funkcji aktywacji bo ta dla większej liczby wyjść niż 4 żadko zwróci coś większego niż 0,5 więc zaokrąglenie uwali do 0, zmiana bd wtedy w konstruktrze sieci żeby szło wybrac funkcję aktywacji
 	{
 		/// <summary>
 		/// </summary>
