@@ -193,13 +193,15 @@ namespace NeuralNetworks.Network
 		//TODO asynchroniczna?
 		//TODO opis (w jakiej formei dane że dwie ostatnie kolumny to poprawne odp (o ile są dwa neurony wyjściwoe))
 		//TODO for na danych wejściowych jako parrarel? -> chyba nie bo tablice z deltami itd są wspólne
-		public void Train(Csv traningDataFile, int maxEpochs, double learningRate, double momentum)
+		public void Train(Csv traningDataFile, int maxEpochs, double learningRate)
 		{
 			var traningData = traningDataFile.DeserializeByRows<double>();
 			var connectionWeightsCorrection = CreateWeightsArray();
 			var connectionWeightDelta = CreateWeightsArray();
 			var connectionPartialDerivative = CreateWeightsArray();
 			var localGradientErrorSignal = CreateBiasesArray();
+			var biasDelta = CreateBiasesArray();
+			var biasPartialDerivative = CreateBiasesArray();
 			int epoch = 0;
 
 			int[] randomIndex = new int[traningData.GetLength(0)];
@@ -221,7 +223,6 @@ namespace NeuralNetworks.Network
 
 
 					//3.4 || 3.5
-					////TODO dodać obliczenia dla biasów
 					for (int layer = localGradientErrorSignal.Length-1; layer >= 0; layer--)
 					{
 						for (int neuron = 0; neuron < localGradientErrorSignal[layer].Length; neuron++)
@@ -232,6 +233,10 @@ namespace NeuralNetworks.Network
 								var errorSignal = correctResults[neuron] - currentOutput[neuron]; //3.6
 								derivative = (1 - currentOutput[neuron]) * currentOutput[neuron]; //3.7
 								localGradientErrorSignal[layer][neuron] = errorSignal * derivative; //3.5
+								if (_neuronsBiases != null)
+								{
+									biasPartialDerivative[layer][neuron] = localGradientErrorSignal[layer][neuron] * 1.0; //input for bias is always 1.0 and bias array is [][] so it can be computed here
+								}
 							}
 							else
 							{
@@ -243,12 +248,16 @@ namespace NeuralNetworks.Network
 									sum = localGradientErrorSignal[layer][neuron] * _connectionsWeights[layer + 1][neuron][connection];
 								}
 								localGradientErrorSignal[layer][neuron] = sum * derivative; //3.5
+
+								if (_neuronsBiases != null)
+								{
+									biasPartialDerivative[layer][neuron] = localGradientErrorSignal[layer][neuron] * 1.0; //input for bias is always 1.0 and bias array is [][] so it can be computed here
+								}
 							}
 						}
 					}
 
 					//3.3
-					////TODO dodać obliczenia dla biasów
 					for (int layer = 0; layer < connectionPartialDerivative.Length; layer++)
 					{
 						for (int neuron = 0; neuron < connectionPartialDerivative[layer].Length; neuron++)
@@ -262,7 +271,6 @@ namespace NeuralNetworks.Network
 					}
 
 					//3.2
-					////TODO dodać obliczenia dla biasów
 					for (int layer = 0; layer < connectionWeightDelta.Length; layer++)
 					{
 						for (int neuron = 0; neuron < connectionWeightDelta[layer].Length; neuron++)
@@ -274,36 +282,37 @@ namespace NeuralNetworks.Network
 						}
 					}
 
-					//3.1
-					////TODO dodać obliczenia dla biasów
-					for (int layer = 0; layer < connectionWeightsCorrection.Length; layer++)
+					if (_neuronsBiases != null)
 					{
-						for (int neuron = 0; neuron < connectionWeightsCorrection[layer].Length; neuron++)
+						for (int layer = 0; layer < biasDelta.Length; layer++)
 						{
-							for (int connection = 0;
-								connection < connectionWeightsCorrection[layer][neuron].Length;
-								connection++)
+							for (int neuron = 0; neuron < biasPartialDerivative[layer].Length; neuron++)
 							{
-								connectionWeightsCorrection[layer][neuron][connection] = _connectionsWeights[layer][neuron][connection] * connectionWeightDelta[layer][neuron][connection];
+								biasDelta[layer][neuron] = learningRate * biasPartialDerivative[layer][neuron];
 							}
 						}
 					}
-					//weightsUpdate
-					//TODO dodać obliczenia dla biasów
+
+					//3.1 weightsUpdate
 					for (int layer = 0; layer < connectionWeightsCorrection.Length; layer++)
 					{
 						for (int neuron = 0; neuron < connectionWeightsCorrection[layer].Length; neuron++)
 						{
 							for (int connection = 0; connection < connectionWeightsCorrection[layer][neuron].Length; connection++)
 							{
-								_connectionsWeights[layer][neuron][connection] +=
-									connectionWeightsCorrection[layer][neuron][connection];
+								_connectionsWeights[layer][neuron][connection] += connectionWeightDelta[layer][neuron][connection];
 							}
 						}
 					}
 					if (_neuronsBiases != null)
 					{
-						throw new NotImplementedException();
+						for (int layer = 0; layer < _neuronsBiases.Length; layer++)
+						{
+							for (int neuron = 0; neuron < _neuronsBiases[layer].Length; neuron++)
+							{
+								_neuronsBiases[layer][neuron] += biasDelta[layer][neuron];
+							}
+						}
 					}
 				}
 				epoch++;

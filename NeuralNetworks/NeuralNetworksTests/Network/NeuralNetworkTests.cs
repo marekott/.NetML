@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using FileDeserializer.CSV;
 using NeuralNetworks.Network;
 using NeuralNetworksTests.Mock;
@@ -543,7 +542,6 @@ namespace NeuralNetworksTests.Network
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test2Inputs2Outputs.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
-			double momentum = 0.05;
 
 			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs);
 			neuralNetwork.SetWeights(randomNumbers);
@@ -551,7 +549,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate, momentum);
+			neuralNetwork.Train(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -568,14 +566,13 @@ namespace NeuralNetworksTests.Network
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test2Inputs2Outputs.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
-			double momentum = 0.05;
 
 			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs);
 			neuralNetwork.SetWeights(randomNumbers);
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate, momentum);
+			neuralNetwork.Train(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -593,7 +590,6 @@ namespace NeuralNetworksTests.Network
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test2Inputs2Outputs.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
-			double momentum = 0.05;
 
 			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
@@ -601,7 +597,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate, momentum);
+			neuralNetwork.Train(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -619,14 +615,13 @@ namespace NeuralNetworksTests.Network
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test2Inputs2Outputs.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
-			double momentum = 0.05;
 
 			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate, momentum);
+			neuralNetwork.Train(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -644,7 +639,6 @@ namespace NeuralNetworksTests.Network
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test3Inputs2Outputs.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
-			double momentum = 0.05;
 
 			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
@@ -652,7 +646,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate, momentum);
+			neuralNetwork.Train(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -670,14 +664,13 @@ namespace NeuralNetworksTests.Network
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test3Inputs2Outputs.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
-			double momentum = 0.05;
 
 			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate, momentum);
+			neuralNetwork.Train(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -695,7 +688,6 @@ namespace NeuralNetworksTests.Network
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test3Inputs4Outputs.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
-			double momentum = 0.05;
 
 			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
@@ -703,7 +695,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate, momentum);
+			neuralNetwork.Train(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -721,14 +713,13 @@ namespace NeuralNetworksTests.Network
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test3Inputs4Outputs.csv"), ';');
 			int maxEpochs = 5000;
 			double learningRate = 0.90;
-			double momentum = 0.05;
 
 			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate, momentum);
+			neuralNetwork.Train(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -747,14 +738,13 @@ namespace NeuralNetworksTests.Network
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_test_data.csv"), ';');
 			int maxEpochs = 5000;
 			double learningRate = 0.10;
-			double momentum = 0.05;
 
 			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate, momentum);
+			neuralNetwork.Train(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -774,7 +764,6 @@ namespace NeuralNetworksTests.Network
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_test_data.csv"), ';');
 			int maxEpochs = 5000;
 			double learningRate = 0.10;
-			double momentum = 0.05;
 
 			var neuralNetwork = new NeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
@@ -782,7 +771,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate, momentum);
+			neuralNetwork.Train(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
