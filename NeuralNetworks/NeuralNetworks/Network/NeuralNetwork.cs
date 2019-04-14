@@ -192,6 +192,7 @@ namespace NeuralNetworks.Network
 		
 		//TODO asynchroniczna?
 		//TODO opis (w jakiej formei dane że dwie ostatnie kolumny to poprawne odp (o ile są dwa neurony wyjściwoe))
+		//TODO for na danych wejściowych jako parrarel? -> chyba nie bo tablice z deltami itd są wspólne
 		public void Train(Csv traningDataFile, int maxEpochs, double learningRate, double momentum)
 		{
 			var traningData = traningDataFile.DeserializeByRows<double>();
@@ -200,7 +201,6 @@ namespace NeuralNetworks.Network
 			var connectionPartialDerivative = CreateWeightsArray();
 			var localGradientErrorSignal = CreateBiasesArray();
 			int epoch = 0;
-			double derivative;
 
 			int[] randomIndex = new int[traningData.GetLength(0)];
 			for (int i = 0; i < randomIndex.Length; i++)
@@ -220,11 +220,13 @@ namespace NeuralNetworks.Network
 					var currentOutput = ComputeOutput(inputs);
 
 
-					//3.4 || 3.5//TODO dodać obliczenia dla biasów
+					//3.4 || 3.5
+					////TODO dodać obliczenia dla biasów
 					for (int layer = localGradientErrorSignal.Length-1; layer >= 0; layer--)
 					{
 						for (int neuron = 0; neuron < localGradientErrorSignal[layer].Length; neuron++)
 						{
+							double derivative;
 							if (layer == localGradientErrorSignal.Length - 1)
 							{
 								var errorSignal = correctResults[neuron] - currentOutput[neuron]; //3.6
@@ -245,7 +247,8 @@ namespace NeuralNetworks.Network
 						}
 					}
 
-					//3.3//TODO dodać obliczenia dla biasów
+					//3.3
+					////TODO dodać obliczenia dla biasów
 					for (int layer = 0; layer < connectionPartialDerivative.Length; layer++)
 					{
 						for (int neuron = 0; neuron < connectionPartialDerivative[layer].Length; neuron++)
@@ -258,7 +261,8 @@ namespace NeuralNetworks.Network
 						}
 					}
 
-					//3.2//TODO dodać obliczenia dla biasów
+					//3.2
+					////TODO dodać obliczenia dla biasów
 					for (int layer = 0; layer < connectionWeightDelta.Length; layer++)
 					{
 						for (int neuron = 0; neuron < connectionWeightDelta[layer].Length; neuron++)
@@ -270,7 +274,8 @@ namespace NeuralNetworks.Network
 						}
 					}
 
-					//3.1//TODO dodać obliczenia dla biasów
+					//3.1
+					////TODO dodać obliczenia dla biasów
 					for (int layer = 0; layer < connectionWeightsCorrection.Length; layer++)
 					{
 						for (int neuron = 0; neuron < connectionWeightsCorrection[layer].Length; neuron++)
@@ -283,26 +288,25 @@ namespace NeuralNetworks.Network
 							}
 						}
 					}
-				}
-				epoch++;
-			}
-
-			//weightsUpdate//TODO dodać obliczenia dla biasów
-			for (int layer = 0; layer < connectionWeightsCorrection.Length; layer++)
-			{
-				for (int neuron = 0; neuron < connectionWeightsCorrection[layer].Length; neuron++)
-				{
-					for (int connection = 0; connection < connectionWeightsCorrection[layer][neuron].Length; connection++)
+					//weightsUpdate
+					//TODO dodać obliczenia dla biasów
+					for (int layer = 0; layer < connectionWeightsCorrection.Length; layer++)
 					{
-						_connectionsWeights[layer][neuron][connection] +=
-							connectionWeightsCorrection[layer][neuron][connection];
+						for (int neuron = 0; neuron < connectionWeightsCorrection[layer].Length; neuron++)
+						{
+							for (int connection = 0; connection < connectionWeightsCorrection[layer][neuron].Length; connection++)
+							{
+								_connectionsWeights[layer][neuron][connection] +=
+									connectionWeightsCorrection[layer][neuron][connection];
+							}
+						}
+					}
+					if (_neuronsBiases != null)
+					{
+						throw new NotImplementedException();
 					}
 				}
-			}
-
-			if (_neuronsBiases != null)
-			{
-				throw new NotImplementedException();
+				epoch++;
 			}
 		}
 		//TODO Refactor
@@ -402,7 +406,7 @@ namespace NeuralNetworks.Network
 			}
 		}
 
-		//TODO działa tylko dla funkcji aktywacji  w wartwie wyjściowej jak jeden neuron zwraca 1 a drugi 0 czyli jak jest Softmax dla nerunów więcej niż dwóch to żaden nigdy nie da jeden (bo zaokrągla wartości zrzutowane na wektor jednostkowy)
+		//TODO troche na pałe bo czysto teoretycznie przy 4 neuronach każdy może zwrócić 0.25 i żaden nie będzie zaokrąglony do 1
 		public double GetAccuracy(Csv fileWithData)
 		{
 			int numCorrect = 0;
