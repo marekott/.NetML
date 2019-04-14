@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Network\FeedForwardNeuralNetwork.cs" />
     <Compile Include="Network\NeuralNetwork.cs" />
     <Compile Include="Neurons\Neuron.cs" />
     <Compile Include="Neurons\NeuronHiddenLayer.cs" />

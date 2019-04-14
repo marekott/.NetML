@@ -64,6 +64,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Mock\MockFileLocator.cs" />
+    <Compile Include="Mock\NeuralNetworkMock.cs" />
+    <Compile Include="Network\FeedForwardNeuralNetworkTests.cs" />
     <Compile Include="Network\NeuralNetworkTests.cs" />
     <Compile Include="Neurons\NeuronHiddenLayerTests.cs" />
     <Compile Include="Neurons\NeuronInputLayerTests.cs" />
