@@ -80,6 +80,7 @@ namespace NeuralNetworks.Network
 
 			return neuronsArray;
 		}
+
 		/// <summary>
 		/// Help method for CreateNeuronsArray()
 		/// </summary>
@@ -104,6 +105,7 @@ namespace NeuralNetworks.Network
 
 			return array;
 		}
+
 		/// <summary>
 		/// Help method for CreateNeuronsArray()
 		/// </summary>
@@ -115,6 +117,7 @@ namespace NeuralNetworks.Network
 
 			return array;
 		}
+
 		/// <summary>
 		/// Creates three dimensional array in which first dimension represents layer of network, second neurons in that layer and third connections of each neuron to neurons in next layer. Output layer is skipped.
 		/// </summary>
@@ -148,6 +151,7 @@ namespace NeuralNetworks.Network
 
 			return array;
 		}
+
 		/// <summary>
 		/// Help method for CreateWeightsArray()
 		/// </summary>
@@ -178,13 +182,17 @@ namespace NeuralNetworks.Network
 			return numberOfConnectionsLayers;
 		}
 
-		//TODO metoda obliczająca potrzebną liczbę wag i porównująca z tą z pliku + opis metody jak w pliku powinny być ułożone wagi
 		//TODO losowe ustawianie wag
+		/// <summary>
+		/// Sets initial weights based on provided file. Weights should be sorted by layers and next by neurons starting with the one at the top of the layer.
+		/// </summary>
+		/// <param name="fileWithWeights">For 2 inputs and 3 outputs first 3 weights will be assign to the first neuron in input layer. Next 3 for second.</param>
 		public void SetWeights(Csv fileWithWeights)
 		{
-			int currentWeightFromFile = 0;
 			var weights = fileWithWeights.Deserialize<double>();
+			CheckFileLength(weights.Length, CountConnections());
 			ConnectionsWeights = CreateWeightsArray();
+			int currentWeightFromFile = 0;
 
 			foreach (var layer in ConnectionsWeights)
 			{
@@ -198,13 +206,17 @@ namespace NeuralNetworks.Network
 			}
 		}
 
-		//TODO metoda obliczająca potrzebną liczbę progów i porównująca z tą z pliku (chyba że nie każdy neuron musi mieć bias) + opis metody jak w pliku powinny być ułożone biasy
 		//TODO losowe ustawianie biasów
-		public  void SetBiases(Csv fileWithBiases)
+		/// <summary>
+		/// Sets initial biases based on provided file. Biases should be sorted by layers and next by neurons starting with the one at the top of the layer. Input layer is skipped.
+		/// </summary>
+		/// <param name="fileWithBiases">For 2 inputs and 3 outputs first bias will be assign to the first neuron in output layer. Next one for second.</param>
+		public void SetBiases(Csv fileWithBiases)
 		{
-			int currentBiasFromFile = 0;
 			var biases = fileWithBiases.Deserialize<double>();
+			CheckFileLength(biases.Length, CountBiases());
 			NeuronsBiases = CreateNeuronsArray();
+			int currentBiasFromFile = 0;
 
 			foreach (var layer in NeuronsBiases)
 			{
@@ -213,6 +225,72 @@ namespace NeuralNetworks.Network
 					layer[currentNeuron] = biases[currentBiasFromFile++];
 				}
 			}
+		}
+
+		private static void CheckFileLength(int fileLength, int expectedFileLength)
+		{
+			if (fileLength < expectedFileLength)
+			{
+				throw new WrongSourceFileLengthException(expectedFileLength, fileLength);
+			}
+		}
+
+		public int CountConnections()
+		{
+			var result = CountFirstLayerConnections();
+			if (HiddenLayersNumber == 0)
+			{
+				return result;
+			}
+
+			var innerHiddenConnections = CountHiddenConnections();
+			var lastLayerConnections = CountLastLayerConnections();
+
+			result += innerHiddenConnections + lastLayerConnections;
+
+			return result;
+		}
+
+		private int CountFirstLayerConnections()
+		{
+			var result = HiddenLayersNumber == 0 ? InputLayerNeuronsNumber * OutputLayerNeuronsNumber : InputLayerNeuronsNumber * HiddenLayer[0].Length;
+			return result;
+		}
+
+		private int CountHiddenConnections()
+		{
+			int result = 0;
+			for (int layer = 0; layer < HiddenLayersNumber - 1; layer++)
+			{
+				result += HiddenLayer[layer].Length * HiddenLayer[layer + 1].Length;
+			}
+
+			return result;
+		}
+
+		private int CountLastLayerConnections()
+		{
+			int result = HiddenLayer[HiddenLayersNumber - 1].Length * OutputLayerNeuronsNumber;
+			return result;
+		}
+
+		public int CountBiases()
+		{
+			int result = CountHiddenNeurons() + OutputLayerNeuronsNumber;
+
+			return result;
+		}
+
+		private int CountHiddenNeurons()
+		{
+			int result = 0;
+
+			for (int layer = 0; layer < HiddenLayersNumber; layer++)
+			{
+				result += HiddenLayer[layer].Length;
+			}
+
+			return result;
 		}
 	}
 }

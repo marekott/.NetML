@@ -10,114 +10,13 @@ namespace NeuralNetworks.Network
 		public FeedForwardNeuralNetwork(int networkInputs, int numberOfOutputs, int[] hiddenLayers = null, int inputNeuronInputs = 1) : base(networkInputs, numberOfOutputs, hiddenLayers, inputNeuronInputs)
 		{
 		}
-		
-		//TODO jakiś test czy liczba inputów równa się liczbie neuronów wejściowych
-		public override double[] ComputeOutput(double[] input)
-		{
-			var signalsSums = new double[ConnectionsWeights.Length][];
 
-			for (int layer = 0; layer < signalsSums.Length; layer++)
-			{
-				signalsSums = layer == 0 ? ComputeFirstInnerLayerResponse(input) : ComputeInnerLayerResponse(layer, signalsSums);
-			}
-
-			var networkResponse = ComputeOutputLayerResponses(signalsSums.Last());
-
-			return networkResponse;
-		}
-
-		private int CountNeuronsInNextLayer(int currentLayer)
-		{
-			int numberOfNeuronsInNextLayer;
-			if (HiddenLayer != null)
-			{
-				numberOfNeuronsInNextLayer = HiddenLayer.Length > currentLayer ? HiddenLayer[currentLayer].Length : OutputLayerNeuronsNumber;
-			}
-			else
-			{
-				numberOfNeuronsInNextLayer = OutputLayerNeuronsNumber;
-			}
-
-			return numberOfNeuronsInNextLayer;
-		}
-
-		private double[][] ComputeFirstInnerLayerResponse(double[] input)
-		{
-			const int layer = 0;
-			var numberOfNeuronsInNextLayer = CountNeuronsInNextLayer(layer);
-			var signalsSums = new double[ConnectionsWeights.Length][];
-			signalsSums[layer] = new double[numberOfNeuronsInNextLayer];
-
-			for (int connection = 0; connection < numberOfNeuronsInNextLayer; connection++)
-			{
-				for (int neuron = 0; neuron < InputLayerNeuronsNumber; neuron++)
-				{
-					signalsSums[layer][connection] += InputLayer[neuron].ComputeOutput(input) *
-					                                  ConnectionsWeights[layer][neuron][connection];
-				}
-
-				if (NeuronsBiases != null)
-				{
-					signalsSums[layer][connection] += NeuronsBiases[layer][connection];
-				}
-			}
-
-			for (int neuron = 0; neuron < NeuronsInputs[layer].Length; neuron++)
-			{
-				NeuronsInputs[layer][neuron] = signalsSums[layer][neuron];
-			}
-
-			return signalsSums;
-		}
-
-		private double[][] ComputeInnerLayerResponse(int layer, double[][] signalsSums)
-		{
-			var numberOfNeuronsInNextLayer = CountNeuronsInNextLayer(layer);
-			signalsSums[layer] = new double[numberOfNeuronsInNextLayer];
-
-			for (int connection = 0; connection < numberOfNeuronsInNextLayer; connection++)
-			{
-				for (int neuron = 0; neuron < HiddenLayer[layer - 1].Length; neuron++)
-				{
-					signalsSums[layer][connection] += HiddenLayer[layer - 1][neuron].ComputeOutput(signalsSums[layer - 1]) *
-					                                  ConnectionsWeights[layer][neuron][connection];
-					NeuronsOutputs[layer - 1][neuron] =
-						HiddenLayer[layer - 1][neuron].ComputeOutput(signalsSums[layer - 1]);
-				}
-
-				if (NeuronsBiases != null)
-				{
-					signalsSums[layer][connection] += NeuronsBiases[layer][connection];
-				}
-			}
-
-			for (int neuron = 0; neuron < NeuronsInputs[layer].Length; neuron++)
-			{
-				NeuronsInputs[layer][neuron] = signalsSums[layer][neuron];
-			}
-
-			return signalsSums;
-		}
-
-		private double[] ComputeOutputLayerResponses(double[] signalsSums)
-		{
-			var networkResponse = new double[OutputLayerNeuronsNumber];
-			for (int outNeuron = 0; outNeuron < OutputLayerNeuronsNumber; outNeuron++)
-			{
-				networkResponse[outNeuron] = OutputLayer[outNeuron].ComputeOutput(signalsSums);
-				NeuronsOutputs[NeuronsOutputs.Length-1][outNeuron] = networkResponse[outNeuron]; //TODO to pole jest z dupy, zrob to z glowa
-			}
-
-			return networkResponse;
-		}
-		
 		//TODO asynchroniczna?
 		//TODO opis (w jakiej formei dane że dwie ostatnie kolumny to poprawne odp (o ile są dwa neurony wyjściwoe))
-		//TODO for na danych wejściowych jako parrarel? -> chyba nie bo tablice z deltami itd są wspólne
+		//TODO check czy liczba inputów i outputów równa się schematowi sieci
 		public override void Train(Csv traningDataFile, int maxEpochs, double learningRate)
 		{
 			var traningData = traningDataFile.DeserializeByRows<double>();
-			var connectionWeightsCorrection = CreateWeightsArray();
 			var connectionWeightDelta = CreateWeightsArray();
 			var connectionPartialDerivative = CreateWeightsArray();
 			var localGradientErrorSignal = CreateNeuronsArray();
@@ -215,11 +114,11 @@ namespace NeuralNetworks.Network
 					}
 
 					//3.1 weightsUpdate
-					for (int layer = 0; layer < connectionWeightsCorrection.Length; layer++)
+					for (int layer = 0; layer < ConnectionsWeights.Length; layer++)
 					{
-						for (int neuron = 0; neuron < connectionWeightsCorrection[layer].Length; neuron++)
+						for (int neuron = 0; neuron < ConnectionsWeights[layer].Length; neuron++)
 						{
-							for (int connection = 0; connection < connectionWeightsCorrection[layer][neuron].Length; connection++)
+							for (int connection = 0; connection < ConnectionsWeights[layer][neuron].Length; connection++)
 							{
 								ConnectionsWeights[layer][neuron][connection] += connectionWeightDelta[layer][neuron][connection];
 							}
@@ -252,7 +151,116 @@ namespace NeuralNetworks.Network
 			}
 		}
 
-		//TODO troche na pałe bo czysto teoretycznie przy 4 neuronach każdy może zwrócić 0.25 i żaden nie będzie zaokrąglony do 1
+		//TODO jakiś test czy liczba inputów równa się liczbie neuronów wejściowych
+		public override double[] ComputeOutput(double[] input)
+		{
+			CheckIfWeightsAreSet();
+			var signalsSums = new double[ConnectionsWeights.Length][];
+
+			for (int layer = 0; layer < signalsSums.Length; layer++)
+			{
+				signalsSums = layer == 0 ? ComputeFirstInnerLayerResponse(input) : ComputeInnerLayerResponse(layer, signalsSums);
+			}
+
+			var networkResponse = ComputeOutputLayerResponses(signalsSums.Last());
+
+			return networkResponse;
+		}
+
+		private void CheckIfWeightsAreSet()
+		{
+			if (ConnectionsWeights == null)
+			{
+				throw new WeightsNotInitializedException();
+			}
+		}
+
+		private double[][] ComputeFirstInnerLayerResponse(double[] input)
+		{
+			const int layer = 0;
+			var numberOfNeuronsInNextLayer = CountNeuronsInNextLayer(layer);
+			var signalsSums = new double[ConnectionsWeights.Length][];
+			signalsSums[layer] = new double[numberOfNeuronsInNextLayer];
+
+			for (int connection = 0; connection < numberOfNeuronsInNextLayer; connection++)
+			{
+				for (int neuron = 0; neuron < InputLayerNeuronsNumber; neuron++)
+				{
+					signalsSums[layer][connection] += InputLayer[neuron].ComputeOutput(input) *
+													  ConnectionsWeights[layer][neuron][connection];
+				}
+
+				if (NeuronsBiases != null)
+				{
+					signalsSums[layer][connection] += NeuronsBiases[layer][connection];
+				}
+			}
+
+			for (int neuron = 0; neuron < NeuronsInputs[layer].Length; neuron++)
+			{
+				NeuronsInputs[layer][neuron] = signalsSums[layer][neuron];
+			}
+
+			return signalsSums;
+		}
+
+		private double[][] ComputeInnerLayerResponse(int layer, double[][] signalsSums)
+		{
+			var numberOfNeuronsInNextLayer = CountNeuronsInNextLayer(layer);
+			signalsSums[layer] = new double[numberOfNeuronsInNextLayer];
+
+			for (int connection = 0; connection < numberOfNeuronsInNextLayer; connection++)
+			{
+				for (int neuron = 0; neuron < HiddenLayer[layer - 1].Length; neuron++)
+				{
+					signalsSums[layer][connection] += HiddenLayer[layer - 1][neuron].ComputeOutput(signalsSums[layer - 1]) *
+													  ConnectionsWeights[layer][neuron][connection];
+					NeuronsOutputs[layer - 1][neuron] =
+						HiddenLayer[layer - 1][neuron].ComputeOutput(signalsSums[layer - 1]);
+				}
+
+				if (NeuronsBiases != null)
+				{
+					signalsSums[layer][connection] += NeuronsBiases[layer][connection];
+				}
+			}
+
+			for (int neuron = 0; neuron < NeuronsInputs[layer].Length; neuron++)
+			{
+				NeuronsInputs[layer][neuron] = signalsSums[layer][neuron];
+			}
+
+			return signalsSums;
+		}
+
+		private int CountNeuronsInNextLayer(int currentLayer)
+		{
+			int numberOfNeuronsInNextLayer;
+			if (HiddenLayer != null)
+			{
+				numberOfNeuronsInNextLayer = HiddenLayer.Length > currentLayer ? HiddenLayer[currentLayer].Length : OutputLayerNeuronsNumber;
+			}
+			else
+			{
+				numberOfNeuronsInNextLayer = OutputLayerNeuronsNumber;
+			}
+
+			return numberOfNeuronsInNextLayer;
+		}
+
+		private double[] ComputeOutputLayerResponses(double[] signalsSums)
+		{
+			var networkResponse = new double[OutputLayerNeuronsNumber];
+			for (int outNeuron = 0; outNeuron < OutputLayerNeuronsNumber; outNeuron++)
+			{
+				networkResponse[outNeuron] = OutputLayer[outNeuron].ComputeOutput(signalsSums);
+				NeuronsOutputs[NeuronsOutputs.Length - 1][outNeuron] = networkResponse[outNeuron]; //TODO to pole jest z dupy, zrob to z glowa
+			}
+
+			return networkResponse;
+		}
+
+		//TODO dokładne porównanie tj. czy każda zaokrąglona wartosc odp jest równa pożądanej odp
 		public override double GetAccuracy(Csv fileWithData)
 		{
 			int numCorrect = 0;
@@ -261,7 +269,6 @@ namespace NeuralNetworks.Network
 
 			for (int i = 0; i < data.GetLength(0); i++)
 			{
-				//TODO do przemyślenia czy nie przenieść deklaracji poza pętlę
 				var inputs = ExtractInput(data, i);
 				var correctResults = ExtractCorrectResponse(data, i);
 

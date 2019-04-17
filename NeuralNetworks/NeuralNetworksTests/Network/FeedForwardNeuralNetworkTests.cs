@@ -86,12 +86,12 @@ namespace NeuralNetworksTests.Network
 			int numberOfInputs = 3;
 			int[] hiddenLayers = {5, 4, 3, 3, 3};
 			int numberOfOutputs = 3;
-			var fileWithWeights = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 
 			double[] input = {1.0, 1.0, 1.0};
 
 			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
-			neuralNetwork.SetWeights(fileWithWeights);
+			neuralNetwork.SetWeights(randomNumbers);
 
 			neuralNetwork.ComputeOutput(input);
 		}
@@ -181,21 +181,21 @@ namespace NeuralNetworksTests.Network
 		{
 			int numberOfInputs = 2;
 			int numberOfOutputs = 2;
-			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
-			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Traning2Inputs2Outputs.csv"), ';');
-			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test2Inputs2Outputs.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
+			var traningData2Inputs2Outputs = new Csv(new MockFileLocator(@"Mock\traning\data\Traning2Inputs2Outputs.csv"), ';');
+			var testData2Inputs2Outputs = new Csv(new MockFileLocator(@"Mock\traning\data\Test2Inputs2Outputs.csv"), ';');
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 
 			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs);
 			neuralNetwork.SetWeights(randomNumbers);
 			neuralNetwork.SetBiases(randomNumbers);
 
-			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
+			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData2Inputs2Outputs);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate);
+			neuralNetwork.Train(traningData2Inputs2Outputs, maxEpochs, learningRate);
 
-			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
+			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData2Inputs2Outputs);
 
 			Assert.True(accuracyAfterTraning > accuracyBeforeTraning, $"accuracyAfterTraning: {accuracyAfterTraning}, accuracyBeforeTraning: {accuracyBeforeTraning}");
 		}
@@ -205,20 +205,20 @@ namespace NeuralNetworksTests.Network
 		{
 			int numberOfInputs = 2;
 			int numberOfOutputs = 2;
-			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
-			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Traning2Inputs2Outputs.csv"), ';');
-			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test2Inputs2Outputs.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
+			var traningData2Inputs2Outputs = new Csv(new MockFileLocator(@"Mock\traning\data\Traning2Inputs2Outputs.csv"), ';');
+			var testData2Inputs2Outputs = new Csv(new MockFileLocator(@"Mock\traning\data\Test2Inputs2Outputs.csv"), ';');
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';'); //TODO do wywalenia wszędzie ten plik jak bd losowe wagi generowane
 
 			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs);
 			neuralNetwork.SetWeights(randomNumbers);
 
-			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
+			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData2Inputs2Outputs);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate);
+			neuralNetwork.Train(traningData2Inputs2Outputs, maxEpochs, learningRate);
 
-			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
+			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData2Inputs2Outputs);
 
 			Assert.True(accuracyAfterTraning > accuracyBeforeTraning, $"accuracyAfterTraning: {accuracyAfterTraning}, accuracyBeforeTraning: {accuracyBeforeTraning}");
 		}
@@ -229,9 +229,9 @@ namespace NeuralNetworksTests.Network
 			int numberOfInputs = 2;
 			int[] hiddenLayers = { 3 };
 			int numberOfOutputs = 2;
-			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Traning2Inputs2Outputs.csv"), ';');
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test2Inputs2Outputs.csv"), ';');
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
 
@@ -254,9 +254,9 @@ namespace NeuralNetworksTests.Network
 			int numberOfInputs = 2;
 			int[] hiddenLayers = { 3 };
 			int numberOfOutputs = 2;
-			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Traning2Inputs2Outputs.csv"), ';');
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test2Inputs2Outputs.csv"), ';');
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
 
@@ -278,9 +278,9 @@ namespace NeuralNetworksTests.Network
 			int numberOfInputs = 3;
 			int[] hiddenLayers = { 3 };
 			int numberOfOutputs = 2;
-			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Traning3Inputs2Outputs.csv"), ';');
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test3Inputs2Outputs.csv"), ';');
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
 
@@ -303,9 +303,9 @@ namespace NeuralNetworksTests.Network
 			int numberOfInputs = 3;
 			int[] hiddenLayers = { 3 };
 			int numberOfOutputs = 2;
-			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Traning3Inputs2Outputs.csv"), ';');
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test3Inputs2Outputs.csv"), ';');
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
 
@@ -327,9 +327,9 @@ namespace NeuralNetworksTests.Network
 			int numberOfInputs = 3;
 			int[] hiddenLayers = { 3, 2 };
 			int numberOfOutputs = 4;
-			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Traning3Inputs4Outputs.csv"), ';');
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test3Inputs4Outputs.csv"), ';');
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			int maxEpochs = 1000;
 			double learningRate = 0.10;
 
@@ -352,9 +352,9 @@ namespace NeuralNetworksTests.Network
 			int numberOfInputs = 3;
 			int[] hiddenLayers = { 3, 2 };
 			int numberOfOutputs = 4;
-			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Traning3Inputs4Outputs.csv"), ';');
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Test3Inputs4Outputs.csv"), ';');
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			int maxEpochs = 7000;
 			double learningRate = 0.90;
 
@@ -377,9 +377,9 @@ namespace NeuralNetworksTests.Network
 			int[] hiddenLayers = { 3, 2 };
 			int numberOfOutputs = 2;
 
-			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';'); //TODO do wywalenia wszędzie ten plik jak bd losowe wagi generowane
 			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_traning_data.csv"), ';');
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_test_data.csv"), ';');
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			int maxEpochs = 5000;
 			double learningRate = 0.10;
 
@@ -403,9 +403,9 @@ namespace NeuralNetworksTests.Network
 			int[] hiddenLayers = { 3, 2 };
 			int numberOfOutputs = 2;
 
-			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_traning_data.csv"), ';');
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_test_data.csv"), ';');
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			int maxEpochs = 5000;
 			double learningRate = 0.10;
 
@@ -421,6 +421,32 @@ namespace NeuralNetworksTests.Network
 
 			Assert.True(accuracyAfterTraning > accuracyBeforeTraning, $"accuracyAfterTraning: {accuracyAfterTraning}, accuracyBeforeTraning: {accuracyBeforeTraning}");
 			Assert.True(accuracyAfterTraning > 0.5, $"accuracyAfterTraning: {accuracyAfterTraning}");
+		}
+
+		[Fact]
+		public void WasWeightsNotInitializedExceptionThrownOnComputeOutputMethodTest()
+		{
+			int numberOfInputs = 1;
+			int numberOfOutputs = 1;
+			double[] input = {1.0};
+
+			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs);
+
+			Assert.Throws<WeightsNotInitializedException>(() => neuralNetwork.ComputeOutput(input));
+		}
+
+		[Fact]
+		public void WasWeightsNotInitializedExceptionThrownOnTrainMethodTest()
+		{
+			int numberOfInputs = 2;
+			int numberOfOutputs = 2;
+			int maxEpochs = 5000;
+			double learningRate = 0.10;
+			var traningData2Inputs2Outputs = new Csv(new MockFileLocator(@"Mock\traning\data\Traning2Inputs2Outputs.csv"), ';');
+
+			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs);
+
+			Assert.Throws<WeightsNotInitializedException>(() => neuralNetwork.Train(traningData2Inputs2Outputs, maxEpochs, learningRate));
 		}
 	}
 }

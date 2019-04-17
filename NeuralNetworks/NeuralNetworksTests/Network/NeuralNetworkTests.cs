@@ -1,4 +1,5 @@
 ﻿using FileDeserializer.CSV;
+using NeuralNetworks.Network;
 using NeuralNetworksTests.Mock;
 using Xunit;
 
@@ -13,6 +14,7 @@ namespace NeuralNetworksTests.Network
 		private readonly Csv _fileWithBiases2Out;
 		private readonly Csv _fileWithBiases2Hidden2Out;
 		private readonly Csv _fileWithBiases3Hidden2Hidden2Out;
+		private readonly Csv _fileWith3Numbers;
 
 		public NeuralNetworkTests()
 		{
@@ -23,6 +25,7 @@ namespace NeuralNetworksTests.Network
 			_fileWithBiases2Out = new Csv(new MockFileLocator(@"Mock\2_2_Biases.csv"), ';');
 			_fileWithBiases2Hidden2Out = new Csv(new MockFileLocator(@"Mock\2_2_2_Biases.csv"), ';');
 			_fileWithBiases3Hidden2Hidden2Out = new Csv(new MockFileLocator(@"Mock\2_3_2_2_Biases.csv"), ';');
+			_fileWith3Numbers = new Csv(new MockFileLocator(@"Mock\ThreeNumbers.csv"), ';');
 		}
 
 		[Fact]
@@ -367,6 +370,77 @@ namespace NeuralNetworksTests.Network
 			Assert.Equal(hiddenLayers[0], neuralNetwork.NeuronsBiases[0].Length);
 			Assert.Equal(hiddenLayers[1], neuralNetwork.NeuronsBiases[1].Length);
 			Assert.Equal(numberOfOutputs, neuralNetwork.NeuronsBiases[2].Length);
+		}
+
+		[Fact]
+		public void NeuralNetworkCountConnections3_4Test()
+		{
+			int numberOfInputs = 3;
+			int numberOfOutputs = 4;
+			int expectedNumberOfConnections = 12;
+
+			var neuralNetwork = new NeuralNetworkMock(numberOfInputs, numberOfOutputs);
+
+			Assert.Equal(expectedNumberOfConnections, neuralNetwork.CountConnections());
+		}
+
+		[Fact]
+		public void NeuralNetworkCountConnections3_4_2Test()
+		{
+			int numberOfInputs = 3;
+			int[] hiddenLayers = { 4 };
+			int numberOfOutputs = 2;
+			int expectedNumberOfConnections = 20;
+
+			var neuralNetwork = new NeuralNetworkMock(numberOfInputs, numberOfOutputs, hiddenLayers);
+			Assert.Equal(expectedNumberOfConnections, neuralNetwork.CountConnections());
+		}
+
+		[Fact]
+		public void NeuralNetworkCountBiases3_4Test()
+		{
+			int numberOfInputs = 3;
+			int numberOfOutputs = 4;
+			int expectedNumberOfBiases = 4;
+
+			var neuralNetwork = new NeuralNetworkMock(numberOfInputs, numberOfOutputs);
+
+			Assert.Equal(expectedNumberOfBiases, neuralNetwork.CountBiases());
+		}
+
+		[Fact]
+		public void NeuralNetworkCountBiases3_4_2Test()
+		{
+			int numberOfInputs = 3;
+			int[] hiddenLayers = { 4 };
+			int numberOfOutputs = 2;
+			int expectedNumberOfBiases = 6;
+
+			var neuralNetwork = new NeuralNetworkMock(numberOfInputs, numberOfOutputs, hiddenLayers);
+
+			Assert.Equal(expectedNumberOfBiases, neuralNetwork.CountBiases());
+		}
+
+		[Fact]
+		public void NeuralNetworkWeightsSetWasWrongSourceFileLengthExceptionThrown()
+		{
+			int numberOfInputs = 2;
+			int numberOfOutputs = 2;
+
+			var neuralNetwork = new NeuralNetworkMock(numberOfInputs, numberOfOutputs);
+
+			Assert.Throws<WrongSourceFileLengthException>(() => neuralNetwork.SetWeights(_fileWith3Numbers));
+		}
+
+		[Fact]
+		public void NeuralNetworkBiasSetWasWrongSourceFileLengthExceptionThrown()
+		{
+			int numberOfInputs = 2;
+			int numberOfOutputs = 4;
+
+			var neuralNetwork = new NeuralNetworkMock(numberOfInputs, numberOfOutputs);
+
+			Assert.Throws<WrongSourceFileLengthException>(() => neuralNetwork.SetBiases(_fileWith3Numbers));
 		}
 	}
 }
