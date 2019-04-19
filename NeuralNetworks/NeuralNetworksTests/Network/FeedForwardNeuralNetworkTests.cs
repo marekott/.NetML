@@ -193,7 +193,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData2Inputs2Outputs);
 
-			neuralNetwork.Train(traningData2Inputs2Outputs, maxEpochs, learningRate);
+			neuralNetwork.BackPropagationTrain(traningData2Inputs2Outputs, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData2Inputs2Outputs);
 
@@ -216,7 +216,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData2Inputs2Outputs);
 
-			neuralNetwork.Train(traningData2Inputs2Outputs, maxEpochs, learningRate);
+			neuralNetwork.BackPropagationTrain(traningData2Inputs2Outputs, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData2Inputs2Outputs);
 
@@ -241,7 +241,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate);
+			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -265,7 +265,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate);
+			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -290,7 +290,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate);
+			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -314,7 +314,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate);
+			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -339,7 +339,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate);
+			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -363,7 +363,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate);
+			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -388,7 +388,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate);
+			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -415,7 +415,7 @@ namespace NeuralNetworksTests.Network
 
 			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
 
-			neuralNetwork.Train(traningData, maxEpochs, learningRate);
+			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
@@ -436,7 +436,7 @@ namespace NeuralNetworksTests.Network
 		}
 
 		[Fact]
-		public void WasWeightsNotInitializedExceptionThrownOnTrainMethodTest()
+		public void WasWeightsNotInitializedExceptionThrownOnBackPropagationTrainMethodTest()
 		{
 			int numberOfInputs = 2;
 			int numberOfOutputs = 2;
@@ -446,7 +446,99 @@ namespace NeuralNetworksTests.Network
 
 			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs);
 
-			Assert.Throws<WeightsNotInitializedException>(() => neuralNetwork.Train(traningData2Inputs2Outputs, maxEpochs, learningRate));
+			Assert.Throws<WeightsNotInitializedException>(() => neuralNetwork.BackPropagationTrain(traningData2Inputs2Outputs, maxEpochs, learningRate));
+		}
+
+
+		[Fact]
+		public void WasWrongSourceFileLengthExceptionThrownOnBackPropagationTrainMethodToManyTraningDataTest()
+		{
+			int numberOfInputs = 4;
+			int numberOfOutputs = 2;
+			int maxEpochs = 5000;
+			double learningRate = 0.10;
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
+			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_traning_data.csv"), ';');
+
+			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs);
+			neuralNetwork.SetWeights(randomNumbers);
+
+			Assert.Throws<WrongSourceFileLengthException>(() => neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate));
+		}
+
+		[Fact]
+		public void WasWrongSourceFileLengthExceptionThrownOnBackPropagationTrainMethodNotEnoughTraningDataTest()
+		{
+			int numberOfInputs = 5;
+			int numberOfOutputs = 5;
+			int maxEpochs = 5000;
+			double learningRate = 0.10;
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
+			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_traning_data.csv"), ';');
+
+			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs);
+			neuralNetwork.SetWeights(randomNumbers);
+
+			Assert.Throws<WrongSourceFileLengthException>(() => neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate));
+		}
+
+		[Fact]
+		public void WasWrongSourceFileLengthExceptionThrownOnComputeOutputMethodToManyInputsTest()
+		{
+			int numberOfInputs = 4;
+			int numberOfOutputs = 2;
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
+			double[] input = {3.0, 4.0, 5.0, 3.0, 6.0};
+
+
+			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs);
+			neuralNetwork.SetWeights(randomNumbers);
+
+			Assert.Throws<WrongSourceFileLengthException>(() => neuralNetwork.ComputeOutput(input));
+		}
+
+		[Fact]
+		public void WasWrongSourceFileLengthExceptionThrownOnComputeOutputMethodNotEnoughInputsTest()
+		{
+			int numberOfInputs = 4;
+			int numberOfOutputs = 2;
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
+			double[] input = { 3.0, 4.0, 5.0 };
+
+
+			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs);
+			neuralNetwork.SetWeights(randomNumbers);
+
+			Assert.Throws<WrongSourceFileLengthException>(() => neuralNetwork.ComputeOutput(input));
+		}
+
+		[Fact]
+		public void WasWrongSourceFileLengthExceptionThrownOnGetAccuracyMethodToManyInputsTest()
+		{
+			int numberOfInputs = 4;
+			int numberOfOutputs = 2;
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
+			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_test_data.csv"), ';');
+
+			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs);
+			neuralNetwork.SetWeights(randomNumbers);
+
+			Assert.Throws<WrongSourceFileLengthException>(() => neuralNetwork.GetAccuracy(testData));
+		}
+
+		[Fact]
+		public void WasWrongSourceFileLengthExceptionThrownOnGetAccuracyMethodNotEnoughInputsTest()
+		{
+			int numberOfInputs = 6;
+			int numberOfOutputs = 2;
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
+			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_test_data.csv"), ';');
+
+
+			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs);
+			neuralNetwork.SetWeights(randomNumbers);
+
+			Assert.Throws<WrongSourceFileLengthException>(() => neuralNetwork.GetAccuracy(testData));
 		}
 	}
 }

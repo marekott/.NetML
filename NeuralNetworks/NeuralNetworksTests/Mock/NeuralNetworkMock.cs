@@ -10,7 +10,7 @@ namespace NeuralNetworksTests.Mock
 		{
 		}
 
-		public override void Train(Csv traningDataFile, int maxEpochs, double learningRate)
+		public override void BackPropagationTrain(Csv traningDataFile, int maxEpochs, double learningRate)
 		{
 			throw new NotImplementedException();
 		}

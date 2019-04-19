@@ -4,19 +4,22 @@ using FileDeserializer.CSV;
 
 namespace NeuralNetworks.Network
 {
-	//TODO popatrz gdzie try catch wrzucić
 	public class FeedForwardNeuralNetwork : NeuralNetwork
 	{
 		public FeedForwardNeuralNetwork(int networkInputs, int numberOfOutputs, int[] hiddenLayers = null, int inputNeuronInputs = 1) : base(networkInputs, numberOfOutputs, hiddenLayers, inputNeuronInputs)
 		{
 		}
 
-		//TODO asynchroniczna?
-		//TODO opis (w jakiej formei dane że dwie ostatnie kolumny to poprawne odp (o ile są dwa neurony wyjściwoe))
-		//TODO check czy liczba inputów i outputów równa się schematowi sieci
-		public override void Train(Csv traningDataFile, int maxEpochs, double learningRate)
+		/// <summary>
+		/// Method is making corrections to weights and biases of connections between neurons using Backpropagation algorithm.
+		/// </summary>
+		/// <param name="traningDataFile">File will be deserialized to [,] array. Each row have to contain InputLayerNeuronsNumber + OutputLayerNeuronsNumber elements starting with data which will be passed on input of network.</param>
+		/// <param name="maxEpochs">Maximum number of traning iterations.</param>
+		/// <param name="learningRate"></param>
+		public override void BackPropagationTrain(Csv traningDataFile, int maxEpochs, double learningRate)
 		{
 			var traningData = traningDataFile.DeserializeByRows<double>();
+			CheckFileLength(traningData.GetLength(1), InputLayerNeuronsNumber+OutputLayerNeuronsNumber);
 			var connectionWeightDelta = CreateWeightsArray();
 			var connectionPartialDerivative = CreateWeightsArray();
 			var localGradientErrorSignal = CreateNeuronsArray();
@@ -24,122 +27,64 @@ namespace NeuralNetworks.Network
 			var biasPartialDerivative = CreateNeuronsArray();
 			int epoch = 0;
 
-			int[] randomIndex = new int[traningData.GetLength(0)];
-			for (int i = 0; i < randomIndex.Length; i++)
-			{
-				randomIndex[i] = i;
-			}
+			var randomIndexes = GenerateSortedIndexes(traningData.GetLength(0));
 
 			while (epoch < maxEpochs)
 			{
-				KnuthShuffle(randomIndex);
+				KnuthShuffle(randomIndexes);
 
 				for (int trainingRecord = 0; trainingRecord < traningData.GetLength(0); trainingRecord++)
 				{
-					var inputs = ExtractInput(traningData, randomIndex[trainingRecord]);
-					var correctResults = ExtractCorrectResponse(traningData, randomIndex[trainingRecord]);
+					var inputs = ExtractInput(traningData, randomIndexes[trainingRecord]);
+					var correctResults = ExtractCorrectResponse(traningData, randomIndexes[trainingRecord]);
 
 					var currentOutput = ComputeOutput(inputs);
 
-
-					//3.4 || 3.5
-					for (int layer = localGradientErrorSignal.Length-1; layer >= 0; layer--)
-					{
-						for (int neuron = 0; neuron < localGradientErrorSignal[layer].Length; neuron++)
-						{
-							double derivative;
-							if (layer == localGradientErrorSignal.Length - 1)
-							{
-								var errorSignal = correctResults[neuron] - currentOutput[neuron]; //3.6
-								derivative = (1 - currentOutput[neuron]) * currentOutput[neuron]; //3.7
-								localGradientErrorSignal[layer][neuron] = errorSignal * derivative; //3.5
-								if (NeuronsBiases != null)
-								{
-									biasPartialDerivative[layer][neuron] = localGradientErrorSignal[layer][neuron] * 1.0; //input for bias is always 1.0 and bias array is [][] so it can be computed here
-								}
-							}
-							else
-							{
-								derivative = (1 + NeuronsOutputs[layer][neuron]) *
-								             (1 - NeuronsOutputs[layer][neuron]); //3.8
-								double sum = 0.0;
-								for (int connection = 0; connection < ConnectionsWeights[layer + 1][neuron].Length; connection++)
-								{
-									sum = localGradientErrorSignal[layer][neuron] * ConnectionsWeights[layer + 1][neuron][connection];
-								}
-								localGradientErrorSignal[layer][neuron] = sum * derivative; //3.5
-
-								if (NeuronsBiases != null)
-								{
-									biasPartialDerivative[layer][neuron] = localGradientErrorSignal[layer][neuron] * 1.0; //input for bias is always 1.0 and bias array is [][] so it can be computed here
-								}
-							}
-						}
-					}
-
+					//3.4
+					ComputeLocalGradientErrorSignal(localGradientErrorSignal, correctResults, currentOutput);
+					
 					//3.3
-					for (int layer = 0; layer < connectionPartialDerivative.Length; layer++)
-					{
-						for (int neuron = 0; neuron < connectionPartialDerivative[layer].Length; neuron++)
-						{
-							for (int connection = 0; connection < connectionPartialDerivative[layer][neuron].Length; connection++)
-							{
-								//TODO tu może być błąd z indeksowaniem
-								connectionPartialDerivative[layer][neuron][connection] = NeuronsInputs[layer][connection] * localGradientErrorSignal[layer][connection];
-							}
-						}
-					}
-
+					ComputeConnectionPartialDerivative(connectionPartialDerivative, localGradientErrorSignal);
+					
 					//3.2
-					for (int layer = 0; layer < connectionWeightDelta.Length; layer++)
-					{
-						for (int neuron = 0; neuron < connectionWeightDelta[layer].Length; neuron++)
-						{
-							for (int connection = 0; connection < connectionWeightDelta[layer][neuron].Length; connection++)
-							{
-								connectionWeightDelta[layer][neuron][connection] = learningRate * connectionPartialDerivative[layer][neuron][connection];
-							}
-						}
-					}
+					ComputeConnectionWeightDelta(connectionWeightDelta, connectionPartialDerivative, learningRate);
+
+					//3.1 
+					UpdateWeights(connectionWeightDelta);
 
 					if (NeuronsBiases != null)
 					{
-						for (int layer = 0; layer < biasDelta.Length; layer++)
-						{
-							for (int neuron = 0; neuron < biasPartialDerivative[layer].Length; neuron++)
-							{
-								biasDelta[layer][neuron] = learningRate * biasPartialDerivative[layer][neuron];
-							}
-						}
+						//3.5
+						ComputeBiasPartialDerivative(biasPartialDerivative, localGradientErrorSignal);
+						ComputeBiasDelta(biasDelta, biasPartialDerivative, learningRate);
+						UpdateBiases(biasDelta);
 					}
 
-					//3.1 weightsUpdate
-					for (int layer = 0; layer < ConnectionsWeights.Length; layer++)
-					{
-						for (int neuron = 0; neuron < ConnectionsWeights[layer].Length; neuron++)
-						{
-							for (int connection = 0; connection < ConnectionsWeights[layer][neuron].Length; connection++)
-							{
-								ConnectionsWeights[layer][neuron][connection] += connectionWeightDelta[layer][neuron][connection];
-							}
-						}
-					}
-					if (NeuronsBiases != null)
-					{
-						for (int layer = 0; layer < NeuronsBiases.Length; layer++)
-						{
-							for (int neuron = 0; neuron < NeuronsBiases[layer].Length; neuron++)
-							{
-								NeuronsBiases[layer][neuron] += biasDelta[layer][neuron];
-							}
-						}
-					}
 				}
 				epoch++;
 			}
 		}
-		//TODO do osobnej klasy albo coś
-		private void KnuthShuffle(int[] sequence)
+
+		private static void CheckFileLength(int fileLength, int expectedFileLength)
+		{
+			if (fileLength != expectedFileLength)
+			{
+				throw new WrongSourceFileLengthException(expectedFileLength, fileLength);
+			}
+		}
+
+		private static int[] GenerateSortedIndexes(int length)
+		{
+			int[] indexes = new int[length];
+			for (int i = 0; i < indexes.Length; i++)
+			{
+				indexes[i] = i;
+			}
+
+			return indexes;
+		}
+
+		private static void KnuthShuffle(int[] sequence)
 		{
 			Random random = new Random();
 			for (int i = 0; i < sequence.Length; i++)
@@ -151,10 +96,10 @@ namespace NeuralNetworks.Network
 			}
 		}
 
-		//TODO jakiś test czy liczba inputów równa się liczbie neuronów wejściowych
 		public override double[] ComputeOutput(double[] input)
 		{
 			CheckIfWeightsAreSet();
+			CheckFileLength(input.Length, InputLayerNeuronsNumber);
 			var signalsSums = new double[ConnectionsWeights.Length][];
 
 			for (int layer = 0; layer < signalsSums.Length; layer++)
@@ -260,12 +205,117 @@ namespace NeuralNetworks.Network
 			return networkResponse;
 		}
 
+		private void ComputeLocalGradientErrorSignal(double[][] localGradientErrorSignal, double[] correctResults, double[] currentOutput)
+		{
+			for (int layer = localGradientErrorSignal.Length - 1; layer >= 0; layer--)
+			{
+				for (int neuron = 0; neuron < localGradientErrorSignal[layer].Length; neuron++)
+				{
+					double derivative;
+					if (layer == localGradientErrorSignal.Length - 1)
+					{
+						var errorSignal = correctResults[neuron] - currentOutput[neuron]; //3.6
+						derivative = (1 - currentOutput[neuron]) * currentOutput[neuron]; //3.7
+						localGradientErrorSignal[layer][neuron] = errorSignal * derivative; //3.5
+					}
+					else
+					{
+						derivative = (1 + NeuronsOutputs[layer][neuron]) *
+						             (1 - NeuronsOutputs[layer][neuron]); //3.8
+						double sum = 0.0;
+						for (int connection = 0; connection < ConnectionsWeights[layer + 1][neuron].Length; connection++)
+						{
+							sum = localGradientErrorSignal[layer][neuron] * ConnectionsWeights[layer + 1][neuron][connection];
+						}
+						localGradientErrorSignal[layer][neuron] = sum * derivative; //3.5
+					}
+				}
+			}
+		}
+
+		private void ComputeConnectionPartialDerivative(double[][][] connectionPartialDerivative, double[][] localGradientErrorSignal)
+		{
+			for (int layer = 0; layer < connectionPartialDerivative.Length; layer++)
+			{
+				for (int neuron = 0; neuron < connectionPartialDerivative[layer].Length; neuron++)
+				{
+					for (int connection = 0; connection < connectionPartialDerivative[layer][neuron].Length; connection++)
+					{
+						//TODO tu może być błąd z indeksowaniem
+						connectionPartialDerivative[layer][neuron][connection] = NeuronsInputs[layer][connection] * localGradientErrorSignal[layer][connection];
+					}
+				}
+			}
+		}
+
+		private void ComputeConnectionWeightDelta(double[][][] connectionWeightDelta, double[][][] connectionPartialDerivative, double learningRate)
+		{
+			for (int layer = 0; layer < connectionWeightDelta.Length; layer++)
+			{
+				for (int neuron = 0; neuron < connectionWeightDelta[layer].Length; neuron++)
+				{
+					for (int connection = 0; connection < connectionWeightDelta[layer][neuron].Length; connection++)
+					{
+						connectionWeightDelta[layer][neuron][connection] = learningRate * connectionPartialDerivative[layer][neuron][connection];
+					}
+				}
+			}
+		}
+
+		private void UpdateWeights(double[][][] connectionWeightDelta)
+		{
+			for (int layer = 0; layer < ConnectionsWeights.Length; layer++)
+			{
+				for (int neuron = 0; neuron < ConnectionsWeights[layer].Length; neuron++)
+				{
+					for (int connection = 0; connection < ConnectionsWeights[layer][neuron].Length; connection++)
+					{
+						ConnectionsWeights[layer][neuron][connection] += connectionWeightDelta[layer][neuron][connection];
+					}
+				}
+			}
+		}
+
+		private void ComputeBiasPartialDerivative(double[][] biasPartialDerivative, double[][] localGradientErrorSignal)
+		{
+			for (int layer = localGradientErrorSignal.Length - 1; layer >= 0; layer--)
+			{
+				for (int neuron = 0; neuron < localGradientErrorSignal[layer].Length; neuron++)
+				{
+					biasPartialDerivative[layer][neuron] = localGradientErrorSignal[layer][neuron] * 1.0; //input for bias is always 1.0
+				}
+			}
+		}
+
+		private void ComputeBiasDelta(double[][] biasDelta, double[][] biasPartialDerivative, double learningRate)
+		{
+			for (int layer = 0; layer < biasDelta.Length; layer++)
+			{
+				for (int neuron = 0; neuron < biasDelta[layer].Length; neuron++)
+				{
+					biasDelta[layer][neuron] = learningRate * biasPartialDerivative[layer][neuron];
+				}
+			}
+		}
+
+		private void UpdateBiases(double[][] biasDelta)
+		{
+			for (int layer = 0; layer < NeuronsBiases.Length; layer++)
+			{
+				for (int neuron = 0; neuron < NeuronsBiases[layer].Length; neuron++)
+				{
+					NeuronsBiases[layer][neuron] += biasDelta[layer][neuron];
+				}
+			}
+		}
+
 		//TODO dokładne porównanie tj. czy każda zaokrąglona wartosc odp jest równa pożądanej odp
 		public override double GetAccuracy(Csv fileWithData)
 		{
 			int numCorrect = 0;
 			int numWrong = 0;
-			var data = fileWithData.DeserializeByRows<double>();			
+			var data = fileWithData.DeserializeByRows<double>();
+			CheckFileLength(data.GetLength(1), InputLayerNeuronsNumber + OutputLayerNeuronsNumber);
 
 			for (int i = 0; i < data.GetLength(0); i++)
 			{

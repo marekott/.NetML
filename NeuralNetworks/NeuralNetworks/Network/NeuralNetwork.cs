@@ -59,7 +59,7 @@ namespace NeuralNetworks.Network
 			return array;
 		}
 
-		public abstract void Train(Csv traningDataFile, int maxEpochs, double learningRate);
+		public abstract void BackPropagationTrain(Csv traningDataFile, int maxEpochs, double learningRate);
 		public abstract double[] ComputeOutput(double[] input);
 		public abstract double GetAccuracy(Csv fileWithData);
 

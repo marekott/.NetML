@@ -1,11 +1,11 @@
 ﻿using System;
 
 namespace NeuralNetworks.Network
-{
+{	//TODO Refactor wyjatkow
 	public class WrongSourceFileLengthException : Exception
 	{
 		public WrongSourceFileLengthException(int expectedLength, int fileLength) : base(
-			$"File is to short. Expected length {expectedLength}, actual: {fileLength}")
+			$"Wrong file length. Expected length {expectedLength}, actual: {fileLength}")
 		{
 
 		}
