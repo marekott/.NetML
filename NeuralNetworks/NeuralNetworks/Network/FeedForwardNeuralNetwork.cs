@@ -22,9 +22,9 @@ namespace NeuralNetworks.Network
 			CheckFileLength(traningData.GetLength(1), InputLayerNeuronsNumber+OutputLayerNeuronsNumber);
 			var connectionWeightDelta = CreateWeightsArray();
 			var connectionPartialDerivative = CreateWeightsArray();
-			var localGradientErrorSignal = CreateNeuronsArray();
-			var biasDelta = CreateNeuronsArray();
-			var biasPartialDerivative = CreateNeuronsArray();
+			var localGradientErrorSignal = CreateNeuronsArraySkipFirstLayer();
+			var biasDelta = CreateNeuronsArraySkipFirstLayer();
+			var biasPartialDerivative = CreateNeuronsArraySkipFirstLayer();
 			int epoch = 0;
 
 			var randomIndexes = GenerateSortedIndexes(traningData.GetLength(0));
@@ -104,7 +104,14 @@ namespace NeuralNetworks.Network
 
 			for (int layer = 0; layer < signalsSums.Length; layer++)
 			{
-				signalsSums = layer == 0 ? ComputeFirstInnerLayerResponse(input) : ComputeInnerLayerResponse(layer, signalsSums);
+				if (layer == 0)
+				{
+					ComputeFirstInnerLayerResponse(input, signalsSums);
+				}
+				else
+				{
+					ComputeInnerLayerResponse(layer, signalsSums);
+				}
 			}
 
 			var networkResponse = ComputeOutputLayerResponses(signalsSums.Last());
@@ -120,19 +127,17 @@ namespace NeuralNetworks.Network
 			}
 		}
 
-		private double[][] ComputeFirstInnerLayerResponse(double[] input)
+		private void ComputeFirstInnerLayerResponse(double[] input, double[][] signalsSums)
 		{
 			const int layer = 0;
 			var numberOfNeuronsInNextLayer = CountNeuronsInNextLayer(layer);
-			var signalsSums = new double[ConnectionsWeights.Length][];
 			signalsSums[layer] = new double[numberOfNeuronsInNextLayer];
 
 			for (int connection = 0; connection < numberOfNeuronsInNextLayer; connection++)
 			{
 				for (int neuron = 0; neuron < InputLayerNeuronsNumber; neuron++)
 				{
-					signalsSums[layer][connection] += InputLayer[neuron].ComputeOutput(input) *
-													  ConnectionsWeights[layer][neuron][connection];
+					signalsSums[layer][connection] += InputLayer[neuron].ComputeOutput(input) * ConnectionsWeights[layer][neuron][connection];
 				}
 
 				if (NeuronsBiases != null)
@@ -141,15 +146,19 @@ namespace NeuralNetworks.Network
 				}
 			}
 
-			for (int neuron = 0; neuron < NeuronsInputs[layer].Length; neuron++)
-			{
-				NeuronsInputs[layer][neuron] = signalsSums[layer][neuron];
-			}
-
-			return signalsSums;
+			SaveNeuronInputAndOutput(layer, input);
 		}
 
-		private double[][] ComputeInnerLayerResponse(int layer, double[][] signalsSums)
+		private void SaveNeuronInputAndOutput(int layer, double[] input)
+		{
+			for (int neuron = 0; neuron < NeuronsInputs[layer].Length; neuron++)
+			{
+				NeuronsInputs[layer][neuron] = input[neuron];
+				NeuronsOutputs[layer][neuron] = InputLayer[neuron].ComputeOutput(input);
+			}
+		}
+
+		private void ComputeInnerLayerResponse(int layer, double[][] signalsSums)
 		{
 			var numberOfNeuronsInNextLayer = CountNeuronsInNextLayer(layer);
 			signalsSums[layer] = new double[numberOfNeuronsInNextLayer];
@@ -158,10 +167,7 @@ namespace NeuralNetworks.Network
 			{
 				for (int neuron = 0; neuron < HiddenLayer[layer - 1].Length; neuron++)
 				{
-					signalsSums[layer][connection] += HiddenLayer[layer - 1][neuron].ComputeOutput(signalsSums[layer - 1]) *
-													  ConnectionsWeights[layer][neuron][connection];
-					NeuronsOutputs[layer - 1][neuron] =
-						HiddenLayer[layer - 1][neuron].ComputeOutput(signalsSums[layer - 1]);
+					signalsSums[layer][connection] += HiddenLayer[layer - 1][neuron].ComputeOutput(signalsSums[layer - 1]) * ConnectionsWeights[layer][neuron][connection];
 				}
 
 				if (NeuronsBiases != null)
@@ -170,12 +176,16 @@ namespace NeuralNetworks.Network
 				}
 			}
 
+			SaveNeuronInputAndOutput(layer, signalsSums);
+		}
+
+		private void SaveNeuronInputAndOutput(int layer, double[][] signalsSums)
+		{
 			for (int neuron = 0; neuron < NeuronsInputs[layer].Length; neuron++)
 			{
-				NeuronsInputs[layer][neuron] = signalsSums[layer][neuron];
+				NeuronsInputs[layer][neuron] = signalsSums[layer - 1][neuron];
+				NeuronsOutputs[layer][neuron] = HiddenLayer[layer - 1][neuron].ComputeOutput(signalsSums[layer - 1]);
 			}
-
-			return signalsSums;
 		}
 
 		private int CountNeuronsInNextLayer(int currentLayer)
@@ -199,7 +209,6 @@ namespace NeuralNetworks.Network
 			for (int outNeuron = 0; outNeuron < OutputLayerNeuronsNumber; outNeuron++)
 			{
 				networkResponse[outNeuron] = OutputLayer[outNeuron].ComputeOutput(signalsSums);
-				NeuronsOutputs[NeuronsOutputs.Length - 1][outNeuron] = networkResponse[outNeuron]; //TODO to pole jest z dupy, zrob to z glowa
 			}
 
 			return networkResponse;
@@ -220,8 +229,8 @@ namespace NeuralNetworks.Network
 					}
 					else
 					{
-						derivative = (1 + NeuronsOutputs[layer][neuron]) *
-						             (1 - NeuronsOutputs[layer][neuron]); //3.8
+						derivative = (1 + NeuronsOutputs[layer+1][neuron]) *
+						             (1 - NeuronsOutputs[layer+1][neuron]); //3.8
 						double sum = 0.0;
 						for (int connection = 0; connection < ConnectionsWeights[layer + 1][neuron].Length; connection++)
 						{
@@ -241,8 +250,7 @@ namespace NeuralNetworks.Network
 				{
 					for (int connection = 0; connection < connectionPartialDerivative[layer][neuron].Length; connection++)
 					{
-						//TODO tu może być błąd z indeksowaniem
-						connectionPartialDerivative[layer][neuron][connection] = NeuronsInputs[layer][connection] * localGradientErrorSignal[layer][connection];
+						connectionPartialDerivative[layer][neuron][connection] = NeuronsInputs[layer][neuron] * localGradientErrorSignal[layer][connection];
 					}
 				}
 			}
@@ -309,7 +317,11 @@ namespace NeuralNetworks.Network
 			}
 		}
 
-		//TODO dokładne porównanie tj. czy każda zaokrąglona wartosc odp jest równa pożądanej odp
+		/// <summary>
+		/// Computes network accuracy measure on provided data. Network responses are rounded to the nearest integral value.
+		/// </summary>
+		/// <param name="fileWithData"></param>
+		/// <returns></returns>
 		public override double GetAccuracy(Csv fileWithData)
 		{
 			int numCorrect = 0;
@@ -322,11 +334,10 @@ namespace NeuralNetworks.Network
 				var inputs = ExtractInput(data, i);
 				var correctResults = ExtractCorrectResponse(data, i);
 
-				var networkResponse = ComputeOutput(inputs).Select(neuronResponse => Math.Round(neuronResponse)).ToList();
-				int maxIndex = networkResponse.FindIndex(neuronResponse => (int)neuronResponse == 1);
-				int correctMaxIndex = correctResults.ToList().FindIndex(neuronResponse => (int)neuronResponse == 1);
+				var networkResponse = ComputeOutput(inputs).Select(neuronResponse => Math.Round(neuronResponse)).ToArray();
+				var isResponseCorrect = IsResponseCorrect(networkResponse, correctResults);
 
-				if (maxIndex == correctMaxIndex)
+				if (isResponseCorrect)
 				{
 					numCorrect++;
 				}
@@ -368,6 +379,11 @@ namespace NeuralNetworks.Network
 			}
 
 			return correctResults;
+		}
+
+		private static bool IsResponseCorrect(double[] networkResponse, double[] correctResponse)
+		{
+			return !networkResponse.Where((t, i) => (int) t != (int) correctResponse[i]).Any();
 		}
 	}
 }

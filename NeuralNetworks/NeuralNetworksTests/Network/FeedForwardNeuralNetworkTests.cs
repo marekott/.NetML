@@ -191,7 +191,7 @@ namespace NeuralNetworksTests.Network
 			neuralNetwork.SetWeights(randomNumbers);
 			neuralNetwork.SetBiases(randomNumbers);
 
-			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData2Inputs2Outputs);
+			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(testData2Inputs2Outputs);
 
 			neuralNetwork.BackPropagationTrain(traningData2Inputs2Outputs, maxEpochs, learningRate);
 
@@ -214,7 +214,7 @@ namespace NeuralNetworksTests.Network
 			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs);
 			neuralNetwork.SetWeights(randomNumbers);
 
-			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData2Inputs2Outputs);
+			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(testData2Inputs2Outputs);
 
 			neuralNetwork.BackPropagationTrain(traningData2Inputs2Outputs, maxEpochs, learningRate);
 
@@ -239,7 +239,7 @@ namespace NeuralNetworksTests.Network
 			neuralNetwork.SetWeights(randomNumbers);
 			neuralNetwork.SetBiases(randomNumbers);
 
-			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
+			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(testData);
 
 			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
@@ -263,7 +263,7 @@ namespace NeuralNetworksTests.Network
 			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
 
-			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
+			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(testData);
 
 			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
@@ -288,7 +288,7 @@ namespace NeuralNetworksTests.Network
 			neuralNetwork.SetWeights(randomNumbers);
 			neuralNetwork.SetBiases(randomNumbers);
 
-			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
+			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(testData);
 
 			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
@@ -312,7 +312,7 @@ namespace NeuralNetworksTests.Network
 			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
 
-			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
+			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(testData);
 
 			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
@@ -337,7 +337,7 @@ namespace NeuralNetworksTests.Network
 			neuralNetwork.SetWeights(randomNumbers);
 			neuralNetwork.SetBiases(randomNumbers);
 
-			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
+			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(testData);
 
 			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
@@ -361,39 +361,13 @@ namespace NeuralNetworksTests.Network
 			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
 
-			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
+			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(testData);
 
 			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
 			Assert.True(accuracyAfterTraning > accuracyBeforeTraning, $"accuracyAfterTraning: {accuracyAfterTraning}, accuracyBeforeTraning: {accuracyBeforeTraning}");
-		}
-
-		[Fact]
-		public void NetworkTraningProcessOnTitanicDataWithoutBias()
-		{
-			int numberOfInputs = 5;
-			int[] hiddenLayers = { 3, 2 };
-			int numberOfOutputs = 2;
-
-			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_traning_data.csv"), ';');
-			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_test_data.csv"), ';');
-			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
-			int maxEpochs = 5000;
-			double learningRate = 0.10;
-
-			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
-			neuralNetwork.SetWeights(randomNumbers);
-
-			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
-
-			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
-
-			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
-
-			Assert.True(accuracyAfterTraning > accuracyBeforeTraning, $"accuracyAfterTraning: {accuracyAfterTraning}, accuracyBeforeTraning: {accuracyBeforeTraning}");
-			Assert.True(accuracyAfterTraning > 0.5, $"accuracyAfterTraning: {accuracyAfterTraning}");
 		}
 
 		[Fact]
@@ -406,21 +380,21 @@ namespace NeuralNetworksTests.Network
 			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_traning_data.csv"), ';');
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_test_data.csv"), ';');
 			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
-			int maxEpochs = 5000;
-			double learningRate = 0.10;
+			int maxEpochs = 7000;
+			double learningRate = 0.90;
 
 			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
 			neuralNetwork.SetBiases(randomNumbers);
 
-			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(traningData);
+			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(testData);
 
 			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
 
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
 			Assert.True(accuracyAfterTraning > accuracyBeforeTraning, $"accuracyAfterTraning: {accuracyAfterTraning}, accuracyBeforeTraning: {accuracyBeforeTraning}");
-			Assert.True(accuracyAfterTraning > 0.5, $"accuracyAfterTraning: {accuracyAfterTraning}");
+			Assert.True(accuracyAfterTraning > 0.5, $"accuracyAfterTraning: {accuracyAfterTraning}, expected more than 0,5.");
 		}
 
 		[Fact]

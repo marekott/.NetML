@@ -28,8 +28,8 @@ namespace NeuralNetworks.Network
 
 			OutputLayer = CreateNeuronLayer<NeuronOutputLayer>(numberOfOutputs);
 
-			NeuronsInputs = CreateNeuronsArray();
-			NeuronsOutputs = CreateNeuronsArray();
+			NeuronsInputs = CreateNeuronsArraySkipLastLayer();
+			NeuronsOutputs = CreateNeuronsArraySkipLastLayer();
 		}
 		
 		private static T[] CreateNeuronLayer<T>(int size, int numberOfInputs = 0) 
@@ -59,64 +59,36 @@ namespace NeuralNetworks.Network
 			return array;
 		}
 
-		public abstract void BackPropagationTrain(Csv traningDataFile, int maxEpochs, double learningRate);
-		public abstract double[] ComputeOutput(double[] input);
-		public abstract double GetAccuracy(Csv fileWithData);
-
 		/// <summary>
-		/// Creates two dimensional array in which first dimension represents layer of network and second neurons in that layer. Input layer is skipped.
+		/// Creates two dimensional array in which first dimension represents layer of network and second neurons in that layer. Output layer is skipped.
 		/// </summary>
 		/// <returns></returns>
-		protected double[][] CreateNeuronsArray()
+		private double[][] CreateNeuronsArraySkipLastLayer() //TODO ta metoda robi praktycznie to samo co CreateNeuronsArraySkipFirstLayer. Do polaczenia ale przemysl jak bo wymaga to zmian w schemacie tablicy biasow tj. pierwsza warstwa tez mialaby biasy
 		{
-			var numberOfConnectionsLayers = CountConnectionLayers();
-			var lastLayerIndex = numberOfConnectionsLayers - 1;
-			var neuronsArray = new double[numberOfConnectionsLayers][];
+			int numberOfConnectionsLayers = CountConnectionLayers();
+			var weightsArray = new double[numberOfConnectionsLayers][];
 
 			for (int currentLayer = 0; currentLayer < numberOfConnectionsLayers; currentLayer++)
 			{
-				neuronsArray[currentLayer] = InitNeuronsDimension(currentLayer, lastLayerIndex);
+				weightsArray[currentLayer] = InitNeuronsLayer(currentLayer);
 			}
-
-			return neuronsArray;
+			return weightsArray;
 		}
-
 		/// <summary>
-		/// Help method for CreateNeuronsArray()
+		/// Help method for CreateNeuronsArraySkipLastLayer()
 		/// </summary>
 		/// <param name="layer"></param>
-		/// <param name="lastLayerIndex"></param>
 		/// <returns></returns>
-		private double[] InitNeuronsDimension(int layer, int lastLayerIndex)
+		private double[] InitNeuronsLayer(int layer)
 		{
-			double[] array;
-			if (layer == 0)
-			{
-				array = InitNeuronsFirstDimension(layer);
-			}
-			else if (layer == lastLayerIndex)
-			{
-				array = new double[OutputLayerNeuronsNumber];
-			}
-			else
-			{
-				array = new double[HiddenLayer[layer].Length];
-			}
+			var array = layer == 0 ? new double[InputLayerNeuronsNumber] : new double[HiddenLayer[layer - 1].Length];
 
 			return array;
 		}
 
-		/// <summary>
-		/// Help method for CreateNeuronsArray()
-		/// </summary>
-		/// <param name="layer"></param>
-		/// <returns></returns>
-		private double[] InitNeuronsFirstDimension(int layer)
-		{
-			var array = HiddenLayer == null ? new double[OutputLayerNeuronsNumber] : new double[HiddenLayer[layer].Length];
-
-			return array;
-		}
+		public abstract void BackPropagationTrain(Csv traningDataFile, int maxEpochs, double learningRate);
+		public abstract double[] ComputeOutput(double[] input);
+		public abstract double GetAccuracy(Csv fileWithData);
 
 		/// <summary>
 		/// Creates three dimensional array in which first dimension represents layer of network, second neurons in that layer and third connections of each neuron to neurons in next layer. Output layer is skipped.
@@ -215,7 +187,7 @@ namespace NeuralNetworks.Network
 		{
 			var biases = fileWithBiases.Deserialize<double>();
 			CheckFileLength(biases.Length, CountBiases());
-			NeuronsBiases = CreateNeuronsArray();
+			NeuronsBiases = CreateNeuronsArraySkipFirstLayer();
 			int currentBiasFromFile = 0;
 
 			foreach (var layer in NeuronsBiases)
@@ -225,6 +197,61 @@ namespace NeuralNetworks.Network
 					layer[currentNeuron] = biases[currentBiasFromFile++];
 				}
 			}
+		}
+
+		/// <summary>
+		/// Creates two dimensional array in which first dimension represents layer of network and second neurons in that layer. Input layer is skipped.
+		/// </summary>
+		/// <returns></returns>
+		protected double[][] CreateNeuronsArraySkipFirstLayer()
+		{
+			var numberOfConnectionsLayers = CountConnectionLayers();
+			var lastLayerIndex = numberOfConnectionsLayers - 1;
+			var neuronsArray = new double[numberOfConnectionsLayers][];
+
+			for (int currentLayer = 0; currentLayer < numberOfConnectionsLayers; currentLayer++)
+			{
+				neuronsArray[currentLayer] = InitNeuronsDimension(currentLayer, lastLayerIndex);
+			}
+
+			return neuronsArray;
+		}
+
+		/// <summary>
+		/// Help method for CreateNeuronsArray()
+		/// </summary>
+		/// <param name="layer"></param>
+		/// <param name="lastLayerIndex"></param>
+		/// <returns></returns>
+		private double[] InitNeuronsDimension(int layer, int lastLayerIndex)
+		{
+			double[] array;
+			if (layer == 0)
+			{
+				array = InitNeuronsFirstDimension(layer);
+			}
+			else if (layer == lastLayerIndex)
+			{
+				array = new double[OutputLayerNeuronsNumber];
+			}
+			else
+			{
+				array = new double[HiddenLayer[layer].Length];
+			}
+
+			return array;
+		}
+
+		/// <summary>
+		/// Help method for CreateNeuronsArray()
+		/// </summary>
+		/// <param name="layer"></param>
+		/// <returns></returns>
+		private double[] InitNeuronsFirstDimension(int layer)
+		{
+			var array = HiddenLayer == null ? new double[OutputLayerNeuronsNumber] : new double[HiddenLayer[layer].Length];
+
+			return array;
 		}
 
 		private static void CheckFileLength(int fileLength, int expectedFileLength)
