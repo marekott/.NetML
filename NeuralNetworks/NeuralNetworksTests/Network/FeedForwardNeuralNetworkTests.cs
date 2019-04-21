@@ -371,6 +371,33 @@ namespace NeuralNetworksTests.Network
 		}
 
 		[Fact]
+		public void NetworkTraningProcessOnTitanicDataWithoutBias()
+		{
+			int numberOfInputs = 5;
+			int[] hiddenLayers = { 3, 2 };
+			int numberOfOutputs = 2;
+
+			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
+			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_traning_data.csv"), ';');
+			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_test_data.csv"), ';');
+			int maxEpochs = 7000;
+			double learningRate = 0.10;
+
+			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
+			neuralNetwork.SetWeights(randomNumbers);
+
+			double accuracyBeforeTraning = neuralNetwork.GetAccuracy(testData);
+
+			neuralNetwork.BackPropagationTrain(traningData, maxEpochs, learningRate);
+
+			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
+
+			Assert.True(accuracyAfterTraning > accuracyBeforeTraning, $"accuracyAfterTraning: {accuracyAfterTraning}, accuracyBeforeTraning: {accuracyBeforeTraning}");
+			Assert.True(accuracyAfterTraning > 0.5, $"accuracyAfterTraning: {accuracyAfterTraning}, expected more than 0,5.");
+		}
+
+
+		[Fact]
 		public void NetworkTraningProcessOnTitanicDataWithBias()
 		{
 			int numberOfInputs = 5;
