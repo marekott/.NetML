@@ -234,7 +234,7 @@ namespace NeuralNetworks.Network
 						double sum = 0.0;
 						for (int connection = 0; connection < ConnectionsWeights[layer + 1][neuron].Length; connection++)
 						{
-							sum = localGradientErrorSignal[layer][neuron] * ConnectionsWeights[layer + 1][neuron][connection];
+							sum += localGradientErrorSignal[layer + 1][connection] * ConnectionsWeights[layer + 1][neuron][connection];
 						}
 						localGradientErrorSignal[layer][neuron] = sum * derivative; //3.5
 					}

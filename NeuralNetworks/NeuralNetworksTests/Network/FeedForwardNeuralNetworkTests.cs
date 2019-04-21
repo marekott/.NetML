@@ -380,8 +380,8 @@ namespace NeuralNetworksTests.Network
 			var traningData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_traning_data.csv"), ';');
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_test_data.csv"), ';');
 			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
-			int maxEpochs = 7000;
-			double learningRate = 0.90;
+			int maxEpochs = 5000;
+			double learningRate = 0.50;
 
 			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
