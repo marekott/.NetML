@@ -149,6 +149,21 @@ namespace NeuralNetworks.Network
 			SaveNeuronInputAndOutput(layer, input);
 		}
 
+		private int CountNeuronsInNextLayer(int currentLayer)
+		{
+			int numberOfNeuronsInNextLayer;
+			if (HiddenLayer != null)
+			{
+				numberOfNeuronsInNextLayer = HiddenLayer.Length > currentLayer ? HiddenLayer[currentLayer].Length : OutputLayerNeuronsNumber;
+			}
+			else
+			{
+				numberOfNeuronsInNextLayer = OutputLayerNeuronsNumber;
+			}
+
+			return numberOfNeuronsInNextLayer;
+		}
+
 		private void SaveNeuronInputAndOutput(int layer, double[] input)
 		{
 			for (int neuron = 0; neuron < NeuronsInputs[layer].Length; neuron++)
@@ -188,21 +203,6 @@ namespace NeuralNetworks.Network
 			}
 		}
 
-		private int CountNeuronsInNextLayer(int currentLayer)
-		{
-			int numberOfNeuronsInNextLayer;
-			if (HiddenLayer != null)
-			{
-				numberOfNeuronsInNextLayer = HiddenLayer.Length > currentLayer ? HiddenLayer[currentLayer].Length : OutputLayerNeuronsNumber;
-			}
-			else
-			{
-				numberOfNeuronsInNextLayer = OutputLayerNeuronsNumber;
-			}
-
-			return numberOfNeuronsInNextLayer;
-		}
-
 		private double[] ComputeOutputLayerResponses(double[] signalsSums)
 		{
 			var networkResponse = new double[OutputLayerNeuronsNumber];
@@ -220,26 +220,41 @@ namespace NeuralNetworks.Network
 			{
 				for (int neuron = 0; neuron < localGradientErrorSignal[layer].Length; neuron++)
 				{
-					double derivative;
 					if (layer == localGradientErrorSignal.Length - 1)
 					{
-						var errorSignal = correctResults[neuron] - currentOutput[neuron]; //3.6
-						derivative = (1 - currentOutput[neuron]) * currentOutput[neuron]; //3.7
-						localGradientErrorSignal[layer][neuron] = errorSignal * derivative; //3.5
+						localGradientErrorSignal[layer][neuron] = GradientErrorLastLayer(correctResults, currentOutput, neuron);
 					}
 					else
 					{
-						derivative = (1 + NeuronsOutputs[layer+1][neuron]) *
-						             (1 - NeuronsOutputs[layer+1][neuron]); //3.8
-						double sum = 0.0;
-						for (int connection = 0; connection < ConnectionsWeights[layer + 1][neuron].Length; connection++)
-						{
-							sum += localGradientErrorSignal[layer + 1][connection] * ConnectionsWeights[layer + 1][neuron][connection];
-						}
-						localGradientErrorSignal[layer][neuron] = sum * derivative; //3.5
+						localGradientErrorSignal[layer][neuron] = GradientErrorInnerLayer(layer, neuron, localGradientErrorSignal);
 					}
 				}
 			}
+		}
+
+		private static double GradientErrorLastLayer(double[] correctResults, double[] currentOutput, int neuron)
+		{
+			var errorSignal = correctResults[neuron] - currentOutput[neuron]; //3.6
+			double derivative = (1 - currentOutput[neuron]) * currentOutput[neuron]; //3.7
+			double result = errorSignal * derivative; //3.5
+
+			return result;
+		}
+
+		private double GradientErrorInnerLayer(int layer, int neuron, double[][] localGradientErrorSignal)
+		{
+			double derivative = (1 + NeuronsOutputs[layer + 1][neuron]) *
+			             (1 - NeuronsOutputs[layer + 1][neuron]); //3.8
+
+			double sum = 0.0;
+			for (int connection = 0; connection < ConnectionsWeights[layer + 1][neuron].Length; connection++)
+			{
+				sum += localGradientErrorSignal[layer + 1][connection] * ConnectionsWeights[layer + 1][neuron][connection];
+			}
+
+			double result = sum * derivative; //3.5
+
+			return result;
 		}
 
 		private void ComputeConnectionPartialDerivative(double[][][] connectionPartialDerivative, double[][] localGradientErrorSignal)

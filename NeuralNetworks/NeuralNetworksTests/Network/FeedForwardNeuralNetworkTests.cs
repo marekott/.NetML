@@ -393,7 +393,7 @@ namespace NeuralNetworksTests.Network
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
 			Assert.True(accuracyAfterTraning > accuracyBeforeTraning, $"accuracyAfterTraning: {accuracyAfterTraning}, accuracyBeforeTraning: {accuracyBeforeTraning}");
-			Assert.True(accuracyAfterTraning > 0.5, $"accuracyAfterTraning: {accuracyAfterTraning}, expected more than 0,5.");
+			Assert.True(accuracyAfterTraning > 0.5, $"accuracyAfterTraning: {accuracyAfterTraning}, expected more than 0,5."); //TODO to powinno przechodzić zawsze po dodaniu momemntum
 		}
 
 
@@ -408,7 +408,7 @@ namespace NeuralNetworksTests.Network
 			var testData = new Csv(new MockFileLocator(@"Mock\traning\data\Titanic_surviving_test_data.csv"), ';');
 			var randomNumbers = new Csv(new MockFileLocator(@"Mock\Any_Weights.csv"), ';');
 			int maxEpochs = 5000;
-			double learningRate = 0.50;
+			double learningRate = 0.10;
 
 			var neuralNetwork = new FeedForwardNeuralNetwork(numberOfInputs, numberOfOutputs, hiddenLayers);
 			neuralNetwork.SetWeights(randomNumbers);
@@ -421,7 +421,7 @@ namespace NeuralNetworksTests.Network
 			double accuracyAfterTraning = neuralNetwork.GetAccuracy(testData);
 
 			Assert.True(accuracyAfterTraning > accuracyBeforeTraning, $"accuracyAfterTraning: {accuracyAfterTraning}, accuracyBeforeTraning: {accuracyBeforeTraning}");
-			Assert.True(accuracyAfterTraning > 0.5, $"accuracyAfterTraning: {accuracyAfterTraning}, expected more than 0,5.");
+			Assert.True(accuracyAfterTraning > 0.5, $"accuracyAfterTraning: {accuracyAfterTraning}, expected more than 0,5."); //TODO to powinno przechodzić zawsze po dodaniu momemntum
 		}
 
 		[Fact]

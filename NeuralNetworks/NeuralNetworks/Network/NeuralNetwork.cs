@@ -154,7 +154,6 @@ namespace NeuralNetworks.Network
 			return numberOfConnectionsLayers;
 		}
 
-		//TODO losowe ustawianie wag
 		/// <summary>
 		/// Sets initial weights based on provided file. Weights should be sorted by layers and next by neurons starting with the one at the top of the layer.
 		/// </summary>
@@ -178,7 +177,6 @@ namespace NeuralNetworks.Network
 			}
 		}
 
-		//TODO losowe ustawianie biasów
 		/// <summary>
 		/// Sets initial biases based on provided file. Biases should be sorted by layers and next by neurons starting with the one at the top of the layer. Input layer is skipped.
 		/// </summary>

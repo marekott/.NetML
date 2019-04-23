@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace NeuralNetworks.Neurons
 {
-	public class NeuronOutputLayer : Neuron //TODO druga funkcja aktywacji do wyboru
+	public class NeuronOutputLayer : Neuron
 	{
 		/// <summary>
 		/// </summary>
