@@ -16,5 +16,5 @@ TODO:
 1.3 Momentum
 
 
-##Sources
+## Sources
 https://visualstudiomagazine.com/Articles/2015/04/01/Back-Propagation-Using-C.aspx?Page=1
