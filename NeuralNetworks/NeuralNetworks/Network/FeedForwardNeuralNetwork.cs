@@ -22,9 +22,9 @@ namespace NeuralNetworks.Network
 			CheckFileLength(traningData.GetLength(1), InputLayerNeuronsNumber+OutputLayerNeuronsNumber);
 			var connectionWeightDelta = CreateWeightsArray();
 			var connectionPartialDerivative = CreateWeightsArray();
-			var localGradientErrorSignal = CreateNeuronsArraySkipFirstLayer();
-			var biasDelta = CreateNeuronsArraySkipFirstLayer();
-			var biasPartialDerivative = CreateNeuronsArraySkipFirstLayer();
+			var localGradientErrorSignal = CreateTwoDimensionalArray();
+			var biasDelta = CreateTwoDimensionalArray();
+			var biasPartialDerivative = CreateTwoDimensionalArray();
 			int epoch = 0;
 
 			var randomIndexes = GenerateSortedIndexes(traningData.GetLength(0));
