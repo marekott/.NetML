@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using FileDeserializer.CSV;
 
 namespace NeuralNetworks.Network
 {
@@ -16,9 +15,9 @@ namespace NeuralNetworks.Network
 		/// <param name="traningDataFile">File will be deserialized to [,] array. Each row have to contain InputLayerNeuronsNumber + OutputLayerNeuronsNumber elements starting with data which will be passed on input of network.</param>
 		/// <param name="maxEpochs">Maximum number of traning iterations.</param>
 		/// <param name="learningRate"></param>
-		public override void BackPropagationTrain(Csv traningDataFile, int maxEpochs, double learningRate)
-		{
-			var traningData = traningDataFile.DeserializeByRows<double>();
+		public override void BackPropagationTrain(string traningDataFile, int maxEpochs, double learningRate)
+        {
+            var traningData = CsvConverter.DeserializeByRows<double>(traningDataFile, ';');
 			CheckFileLength(traningData.GetLength(1), InputLayerNeuronsNumber+OutputLayerNeuronsNumber);
 			var connectionWeightDelta = CreateWeightsArray();
 			var connectionPartialDerivative = CreateWeightsArray();
@@ -337,11 +336,11 @@ namespace NeuralNetworks.Network
 		/// </summary>
 		/// <param name="fileWithData"></param>
 		/// <returns></returns>
-		public override double GetAccuracy(Csv fileWithData)
+		public override double GetAccuracy(string fileWithData)
 		{
 			int numCorrect = 0;
 			int numWrong = 0;
-			var data = fileWithData.DeserializeByRows<double>();
+            var data = CsvConverter.DeserializeByRows<double>(fileWithData, ';');
 			CheckFileLength(data.GetLength(1), InputLayerNeuronsNumber + OutputLayerNeuronsNumber);
 
 			for (int i = 0; i < data.GetLength(0); i++)

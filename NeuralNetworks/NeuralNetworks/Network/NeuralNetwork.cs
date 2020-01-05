@@ -17,11 +17,12 @@ namespace NeuralNetworks.Network
         public int InputLayerNeuronsNumber => InputLayer.Length;
         public int HiddenLayersNumber => HiddenLayer?.Length ?? 0;
         public int OutputLayerNeuronsNumber => OutputLayer.Length;
+        protected readonly ICsvConverter CsvConverter;
         #endregion
 
-        public abstract void BackPropagationTrain(Csv traningDataFile, int maxEpochs, double learningRate);
+        public abstract void BackPropagationTrain(string traningDataFile, int maxEpochs, double learningRate);
         public abstract double[] ComputeOutput(double[] input);
-        public abstract double GetAccuracy(Csv fileWithData);
+        public abstract double GetAccuracy(string fileWithData);
 
         #region NeuralNetwork constructor
         protected NeuralNetwork(int networkInputs, int numberOfOutputs, int[] hiddenLayers, int inputNeuronInputs)
@@ -37,6 +38,8 @@ namespace NeuralNetworks.Network
 
             NeuronsInputs = CreateTwoDimensionalArray(true);
             NeuronsOutputs = CreateTwoDimensionalArray(true);
+
+            CsvConverter = new CsvConverter();
         }
 
         private static T[] CreateNeuronLayer<T>(int size, int numberOfInputs = 0)
@@ -188,9 +191,9 @@ namespace NeuralNetworks.Network
         /// Sets initial weights based on provided file. Weights should be sorted by layers and next by neurons starting with the one at the top of the layer.
         /// </summary>
         /// <param name="fileWithWeights">For 2 inputs and 3 outputs first 3 weights will be assign to the first neuron in input layer. Next 3 for second.</param>
-        public void SetWeights(Csv fileWithWeights)
+        public void SetWeights(string fileWithWeights)
         {
-            var weights = fileWithWeights.Deserialize<double>();
+            var weights = CsvConverter.Deserialize<double>(fileWithWeights, ';');
             CheckFileLength(weights.Length, CountConnections());
             ConnectionsWeights = CreateWeightsArray();
             int currentWeightFromFile = 0;
@@ -250,9 +253,9 @@ namespace NeuralNetworks.Network
         /// Sets initial biases based on provided file. Biases should be sorted by layers and next by neurons starting with the one at the top of the layer. Input layer is skipped.
         /// </summary>
         /// <param name="fileWithBiases">For 2 inputs and 3 outputs first bias will be assign to the first neuron in output layer. Next one for second.</param>
-        public void SetBiases(Csv fileWithBiases)
+        public void SetBiases(string fileWithBiases)
         {
-            var biases = fileWithBiases.Deserialize<double>();
+            var biases = CsvConverter.Deserialize<double>(fileWithBiases, ';');
             CheckFileLength(biases.Length, CountBiases());
             NeuronsBiases = CreateTwoDimensionalArray();
             int currentBiasFromFile = 0;

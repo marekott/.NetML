@@ -1,5 +1,4 @@
 ﻿using System;
-using FileDeserializer.CSV;
 using NeuralNetworks.Network;
 
 namespace NeuralNetworksTests.Mock
@@ -10,7 +9,7 @@ namespace NeuralNetworksTests.Mock
 		{
 		}
 
-		public override void BackPropagationTrain(Csv traningDataFile, int maxEpochs, double learningRate)
+		public override void BackPropagationTrain(string traningDataFile, int maxEpochs, double learningRate)
 		{
 			throw new NotImplementedException();
 		}
@@ -20,7 +19,7 @@ namespace NeuralNetworksTests.Mock
 			throw new NotImplementedException();
 		}
 
-		public override double GetAccuracy(Csv fileWithData)
+		public override double GetAccuracy(string fileWithData)
 		{
 			throw new NotImplementedException();
 		}
